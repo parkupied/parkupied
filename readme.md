@@ -1,5 +1,5 @@
-Contract
+Team Contract
 
-1. We can stay late but dont push each other.
-2. We have to meeet everydays tasks, milestones, deadline.
-3. We decide during standups how to work for the day. 
+1. We can stay late but you're not obliged to.
+2. We decide during standups if we're going to pair-program or work individually for that day.
+3. If you're working outside of class, please slack on the channel to let us know what file are you working on.
