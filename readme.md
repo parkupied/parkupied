@@ -7,7 +7,7 @@ Team Contract
 
 Pied Parker
 
-Tech Stack - React Native, Redux, AWS for database.
+Tech Stack - React Native, Redux, firebase for database.
 
 
 MVP: 
