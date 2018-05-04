@@ -1,8 +1,31 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Platform } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+
 import { Constants, Location, Permissions } from 'expo';
 import { MapView } from 'expo';
+
+import * as firebase from 'firebase';
+import 'firebase/firestore';
+
+var config = {
+	apiKey: 'AIzaSyDEJFDnT7LQJE6K1zn3uw_eM2ELHS-n-Yk',
+	authDomain: 'parkupied.firebaseapp.com',
+	databaseURL: 'https://parkupied.firebaseio.com',
+	projectId: 'parkupied',
+	storageBucket: 'parkupied.appspot.com',
+	messagingSenderId: '641475186680'
+};
+
+firebase.initializeApp(config);
+
+const firestore = firebase.firestore();
+
+const settings = {
+	timestampsInSnapshots: true
+};
+firestore.settings(settings);
+
 
 
 export default class App extends Component {
@@ -20,6 +43,16 @@ export default class App extends Component {
       this._getLocationAsync();
     }
   }
+  
+  	componentDidMount() {
+		firestore.collection('users').doc('L0WhdtLGqO8sv1IipMbn').get()
+			.then(users => {
+				console.log('USERSSS', users.data());
+			})
+		firestore.collection('users').doc('L0WhdtLGqO8sv1IipMbn').set({
+			carInfo: { color: 'white'}
+		})
+	}
 
   _getLocationAsync = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
@@ -42,6 +75,7 @@ export default class App extends Component {
 			throw new Error('Location permission not granted');
 		}
 	}
+
 
 	render() {
 		let text = 'Waiting..';
@@ -66,7 +100,7 @@ export default class App extends Component {
 					backgroundColor="#DD4B39"
 					{...iconStyles}
 				>
-					Or with Google
+					Login with Google
 				</FontAwesome.Button>
 			</View>
 		);
