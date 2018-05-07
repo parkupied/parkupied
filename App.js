@@ -5,27 +5,9 @@ import { FontAwesome } from '@expo/vector-icons';
 import { Constants, Location, Permissions } from 'expo';
 import { MapView } from 'expo';
 
-import * as firebase from 'firebase';
-import 'firebase/firestore';
+import firestore from './firestore';
 
-var config = {
-	apiKey: 'AIzaSyDEJFDnT7LQJE6K1zn3uw_eM2ELHS-n-Yk',
-	authDomain: 'parkupied.firebaseapp.com',
-	databaseURL: 'https://parkupied.firebaseio.com',
-	projectId: 'parkupied',
-	storageBucket: 'parkupied.appspot.com',
-	messagingSenderId: '641475186680'
-};
-
-firebase.initializeApp(config);
-
-const firestore = firebase.firestore();
-
-const settings = {
-	timestampsInSnapshots: true
-};
-firestore.settings(settings);
-
+import Signup from './components/signup';
 
 
 export default class App extends Component {
@@ -44,15 +26,6 @@ export default class App extends Component {
     }
   }
   
-  	componentDidMount() {
-		firestore.collection('users').doc('L0WhdtLGqO8sv1IipMbn').get()
-			.then(users => {
-				console.log('USERSSS', users.data());
-			})
-		firestore.collection('users').doc('L0WhdtLGqO8sv1IipMbn').set({
-			carInfo: { color: 'white'}
-		})
-	}
 
   _getLocationAsync = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
@@ -86,8 +59,9 @@ export default class App extends Component {
 		}
 
 		return (
-
-			<View style={styles.buttons}>
+			<View>
+			<Signup />
+			{/* <View style={styles.buttons}>
 				<FontAwesome.Button
 					name="facebook"
 					backgroundColor="#3b5998"
@@ -102,6 +76,7 @@ export default class App extends Component {
 				>
 					Login with Google
 				</FontAwesome.Button>
+			</View> */}
 			</View>
 		);
 	}
