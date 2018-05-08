@@ -6,16 +6,17 @@ const SCREEN_WIDTH = width;
 import firestore from '../firestore';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
-
 export default class Map extends Component {
   constructor() {
     super();
+    // OB/DS: could just do `state = ...` in your class definition
     this.state = {
       location: null,
       errorMessage: null,
       markers: [],
       userPos: {}
     }
+    // OB/DS: class arrow methods instead of binding
     this.handleGive = this.handleGive.bind(this);
     this.handleLook = this.handleLook.bind(this);
   };
@@ -24,7 +25,7 @@ export default class Map extends Component {
     this._getLocationAsync();
   }
 
-  handleLook(event) {
+  handleLook (event) {
     console.log("Looking");
   }
 
@@ -55,6 +56,7 @@ export default class Map extends Component {
       .then(() => firestore.collection('parkingSpots').get())
       .then(allSpots => {
         let tempMarkers = [];
+        // OB/DS: function is getting large, consider splitting it up, e.g. `createMarkerObject` utility function
         allSpots.forEach(spot => {
           // console.log(spot.data().Coordinates);
           console.log(spot.id);
@@ -84,11 +86,12 @@ export default class Map extends Component {
         errorMessage: 'Permission to access location was denied',
       });
     }
-
+    // OB/DS: else
     let location = await Location.getCurrentPositionAsync({});
     this.setState({ location, ready: true });
   };
 
+  // OB/DS: "kill me"
   getLocationAsync = async () => {
     const { Location, Permissions } = Expo;
     const { status } = await Permissions.askAsync(Permissions.LOCATION);
@@ -105,6 +108,7 @@ export default class Map extends Component {
 
   setRegion(location) {
     if (this.state.ready) {
+      // OB/DS: should be listening for some event (maybe map has an onloaded event)
       setTimeout(() => this.map.mapview.animateToRegion(location), 10);
     }
   }
@@ -113,6 +117,7 @@ export default class Map extends Component {
 
     // console.log("LOCATION", this.state.location);
 
+    // OB/DS: dead code below...?
     let text = 'Waiting..';
     if (this.state.errorMessage) {
       text = this.state.errorMessage;

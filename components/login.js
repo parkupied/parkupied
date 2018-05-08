@@ -66,6 +66,7 @@ export default class Login extends Component {
 	}
 }
 
+// OB/DS: good default is having a separate / global style file for re-use
 const styles = StyleSheet.create({
 	buttons: {
 		// justifyContent: 'space-between',
