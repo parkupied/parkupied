@@ -35,7 +35,10 @@ export default class Signup extends Component {
         const carColor = this.state.carColor;
         const license = this.state.license;
 
+        // OB/DS: signup flow in firestore...?
         firestore.collection('users').add({
+            // OB/DS: could spread state instead of capturing all its properties as names entities, e.g...
+            // ...this.state,
             name,
             phone,
             email,

@@ -16,6 +16,7 @@ export default class mainPage extends Component {
     errorMessage: null,
 	};
 
+  // OB/DS: componentDidMount!
 	componentWillMount() {
     if (Platform.OS === 'android' && !Constants.isDevice) {
       this.setState({
@@ -34,11 +35,12 @@ export default class mainPage extends Component {
         errorMessage: 'Permission to access location was denied',
       });
     }
-
+    // OB/DS: logic below should be in `else`
     let location = await Location.getCurrentPositionAsync({});
     this.setState({ location });
 	};
 
+  // OB/DS: "kill me!" - the method below said this to me just now
 	getLocationAsync = async () => {
 		const { Location, Permissions } = Expo;
 		const { status } = await Permissions.askAsync(Permissions.LOCATION);

@@ -1,3 +1,4 @@
+// OB/DS: lots of unused dependencies right now
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Platform, YellowBox } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
@@ -12,6 +13,7 @@ import Signup from './components/signup';
 import mainPage from './components/mainPage';
 import Welcome from './components/welcome';
 import Login from './components/login';
+// OB/DS: commented out code should not be in master
 // YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated in plain JavaScript React classes. Instead, make sure to clean up subscriptions and pending requests in componentWillUnmount to prevent memory leaks.', 'Module RCTImageLoader']);
 
 class App extends Component {
@@ -26,7 +28,7 @@ class App extends Component {
 	}
 }
 
-
+// OB/DS: look into (stack) navigator options / configurations
 export default createStackNavigator({
 
 	signup: { screen: Signup },
