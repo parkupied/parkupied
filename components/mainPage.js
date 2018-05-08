@@ -25,7 +25,7 @@ export default class mainPage extends Component {
       this._getLocationAsync();
     }
   }
-  
+
 
   _getLocationAsync = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);

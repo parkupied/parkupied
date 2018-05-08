@@ -7,7 +7,7 @@ import { Constants, Location, Permissions } from 'expo';
 import { MapView } from 'expo';
 
 import firestore from './firestore';
-
+import Map from './components/Map';
 import Signup from './components/signup';
 import mainPage from './components/mainPage';
 import Welcome from './components/welcome';
@@ -27,9 +27,12 @@ class App extends Component {
 }
 
 export default createStackNavigator({
-	welcome: { screen: Welcome },
-	home: { screen: App },
-	main: { screen: mainPage },
+
 	signup: { screen: Signup },
-	login: { screen: Login },
+	map: { screen: Map},
+	main: { screen: mainPage },
+	home: { screen: App },
+}, 	{
+	initialRouteName: 'signup',
+
 });
