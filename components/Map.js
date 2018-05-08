@@ -4,6 +4,7 @@ import { StyleSheet, Text, Dimensions, View, Platform, Button } from 'react-nati
 const { width, height } = Dimensions.get('window');
 const SCREEN_WIDTH = width;
 import firestore from '../firestore';
+import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 
 export default class Map extends Component {
@@ -50,28 +51,31 @@ export default class Map extends Component {
   handleGive(event) {
     console.log("Giving");
     firestore.collection('parkingSpots')
-      .add({ Coordinates: this.state.location })
+      .add({ Coordinates: this.state.location.coords })
       .then(() => firestore.collection('parkingSpots').get())
       .then(allSpots => {
         let tempMarkers = [];
         allSpots.forEach(spot => {
-          console.log(spot.data().Coordinates.coords);
-          const obj = spot.data().Coordinates.coords;
-          const latlng = {latitude:obj.latitude, longitude: longitude }
-          // create a new marker based on data from DB:
-          //   let newMarker = {
-          //     id: spot.id,
-          //     latlng: spot.coords,
-          //     title: 'some fake title....',
-          //     description: 'some fake description....'
-          //   }
-          //   // then put this new marker into the temporary array:
-          //   tempMarkers.push(newMarker);
-          // });
-          // this.setState({ markers: tempMarkers });
-        })
+          // console.log(spot.data().Coordinates);
+          console.log(spot.id);
+          const spotObj = spot.data().Coordinates;
+          const latlng = { latitude: spotObj.latitude, longitude: spotObj.longitude };
+          const objID = spot.id;
+
+          let newMarker = {
+            id: objID,
+            latlng: latlng,
+            title: 'some fake title....',
+            description: 'some fake description....'
+          }
+
+          tempMarkers.push(newMarker);
+        });
+
+        this.setState({ markers: tempMarkers });
       })
   }
+
 
   _getLocationAsync = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
@@ -96,7 +100,7 @@ export default class Map extends Component {
   }
 
   onRegionChangeComplete = (location) => {
-   // console.log('onRegionChangeComplete', location);
+    console.log('onRegionChangeComplete', location);
   };
 
   setRegion(location) {
@@ -143,7 +147,12 @@ export default class Map extends Component {
           ))}
 
         </MapView>
-
+        {
+          this.state.location &&
+          <Text>{this.state.location.latitude}
+            {this.state.location.longitude}
+          </Text>
+        }
         <Button
           title="Give up Parking!"
           onPress={this.handleGive}>
