@@ -22,21 +22,14 @@ export default class Login extends Component {
 	handleSubmit() {
 		const email = this.state.email;
 		const password = this.state.password;
-		firebase.auth().signInWithEmailAndPassword(email, password).catch(error => {
-			console.log(error);
-		});
-
-		console.log('hitting here');
-
-		// firestore.collection('users').where("name", "==", name)
-		// .get().then(snap => {
-		// 	console.log(snap.forEach(doc => console.log(doc.data())))
-		// 	// for (let key in snap) {
-		// 	//     console.log(key)
-		// 	// }
-		// });
-
-	}
+		firebase.auth().signInWithEmailAndPassword(email, password)
+			.then( () => {
+				this.props.navigation.navigate('map');
+			})
+			.catch(error => {
+				console.log(error);
+			})
+		}
 
 	render() {
 
