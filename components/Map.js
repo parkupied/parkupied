@@ -125,6 +125,7 @@ export default class Map extends Component {
 
 
     return (
+      <View>
       <View style={styles.container}>
         <MapView
           style={styles.map}
@@ -163,6 +164,7 @@ export default class Map extends Component {
           onPress={this.handleLook}>
           Look for Parking!
         </Button>
+      </View>
       </View>
     );
   }
