@@ -25,8 +25,10 @@ class App extends Component {
 }
 
 export default createStackNavigator({
+	signup: { screen: Signup },
 	map: { screen: Map},
 	main: { screen: mainPage },
 	home: { screen: App },
-	signup: { screen: Signup }
+}, 	{
+	initialRouteName: 'signup',
 });
