@@ -29,7 +29,7 @@ handleLook(event) {
 handleGive(event) {
   console.log("Giving");
   firestore.collection('parkingSpots').add({
-    Coordinates: this.state.location
+    Coordinates: this.state.location.coords
   }
   );
 }
