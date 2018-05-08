@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Platform, Button } from 'react-native';
+import { StyleSheet, Text, ScrollView, View, Platform, Button } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements';
 
@@ -52,39 +52,39 @@ export default class Signup extends Component {
             matches: {},
             pastMatches: []
         });
-
+        this.props.navigation.navigate('map');
     }
 
 	render() {
 
 		return (
-            <View style={styles.buttons}>
+            <ScrollView style={styles.buttons}>
                 <FormLabel>Full Name</FormLabel>
-                <FormInput placeholder="Please enter your full name" 
+                <FormInput placeholder="Please enter your full name"
                     onChangeText={name => this.setState({ name })}
                 />
                 <FormLabel>Phone Number</FormLabel>
-                <FormInput placeholder="Please enter your phone number" 
+                <FormInput placeholder="Please enter your phone number"
                     onChangeText={phone => this.setState({ phone })}
                 />
                 <FormLabel>E-mail</FormLabel>
-                <FormInput placeholder="Please enter your email" 
+                <FormInput placeholder="Please enter your email"
                     onChangeText={email => this.setState({ email })}
                 />
                 <FormLabel>Car Manufacturer</FormLabel>
-                <FormInput placeholder="Please enter your car make" 
+                <FormInput placeholder="Please enter your car make"
                     onChangeText={carMake => this.setState({ carMake })}
                 />
                 <FormLabel>Car Model</FormLabel>
-                <FormInput placeholder="Please enter your car model" 
+                <FormInput placeholder="Please enter your car model"
                     onChangeText={carModel => this.setState({ carModel })}
                 />
                 <FormLabel>Car Color</FormLabel>
-                <FormInput placeholder="Please enter your car color" 
+                <FormInput placeholder="Please enter your car color"
                     onChangeText={carColor => this.setState({ carColor })}
                 />
                 <FormLabel>License #</FormLabel>
-                <FormInput placeholder="Please enter your license #" 
+                <FormInput placeholder="Please enter your license #"
                     onChangeText={license => this.setState({ license })}
                 />
                 <View style={styles.buttons}>
@@ -95,7 +95,7 @@ export default class Signup extends Component {
                         Signup
                     </Button>
                 </View>
-            </View>
+            </ScrollView>
 		);
 	}
 }
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
 		// justifyContent: 'space-between',
 		// flexDirection: 'row',
 		margin: 20,
-		marginTop: 50 
+		marginTop: 50
 	},
 });
 
