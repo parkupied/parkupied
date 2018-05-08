@@ -16,48 +16,17 @@ export default class Map extends Component {
       markers: [],
       userPos: {}
     }
-    this.handleGive = this.handleGive.bind(this);
-    this.handleLook = this.handleLook.bind(this);
+
   };
 
-  componentWillMount() {
-    this._getLocationAsync();
-  }
 
-  handleLook(event) {
-    console.log("Looking");
-  }
 
-  //   id: 2,
-  //   latlng: { latitude: 40.70486398294511, longitude: -74.0088782067479 },
-  //   title: 'marker-green',
-  //   description: 'Now you can go...MOVE!!!'
-
-  // Object {
-  //   11:55:30:   "Coordinates": Object {
-  //   11:55:30:     "coords": Object {
-  //   11:55:30:       "accuracy": 20,
-  //   11:55:30:       "altitude": 0,
-  //   11:55:30:       "heading": 0,
-  //   11:55:30:       "latitude": 40.7456107,
-  //   11:55:30:       "longitude": -73.8703107,
-  //   11:55:30:       "speed": 0,
-  //   11:55:30:     },
-  //   11:55:30:     "mocked": false,
-  //   11:55:30:     "timestamp": 1525754668227,
-  //   11:55:30:   },
-  //   11:55:30: }
-
-  handleGive(event) {
-    console.log("Giving");
-    firestore.collection('parkingSpots')
-      .add({ Coordinates: this.state.location.coords })
-      .then(() => firestore.collection('parkingSpots').get())
+  componentDidMount() {
+    this._getLocationAsync()
+    firestore.collection('parkingSpots').get()
       .then(allSpots => {
         let tempMarkers = [];
         allSpots.forEach(spot => {
-          // console.log(spot.data().Coordinates);
-          console.log(spot.id);
           const spotObj = spot.data().Coordinates;
           const latlng = { latitude: spotObj.latitude, longitude: spotObj.longitude };
           const objID = spot.id;
@@ -76,6 +45,17 @@ export default class Map extends Component {
       })
   }
 
+  handleLook = (event) => {
+    console.log("Looking");
+  }
+
+
+  handleGive = (event) =>  {
+    console.log("Giving");
+    firestore.collection('parkingSpots')
+      .add({ Coordinates: this.state.location.coords })
+  }
+
 
   _getLocationAsync = async () => {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
@@ -89,15 +69,7 @@ export default class Map extends Component {
     this.setState({ location, ready: true });
   };
 
-  getLocationAsync = async () => {
-    const { Location, Permissions } = Expo;
-    const { status } = await Permissions.askAsync(Permissions.LOCATION);
-    if (status === 'granted') {
-      return Location.getCurrentPositionAsync({ enableHighAccuracy: true });
-    } else {
-      throw new Error('Location permission not granted');
-    }
-  }
+
 
   onRegionChangeComplete = (location) => {
     console.log('onRegionChangeComplete', location);
@@ -111,14 +83,8 @@ export default class Map extends Component {
 
   render() {
 
-    // console.log("LOCATION", this.state.location);
 
-    let text = 'Waiting..';
-    if (this.state.errorMessage) {
-      text = this.state.errorMessage;
-    } else if (this.state.location) {
-      text = JSON.stringify(this.state.location);
-    }
+
 
     const { location } = this.state;
 
