@@ -1,18 +1,22 @@
 import React, { Component } from 'react';
 import {Header} from 'react-native-elements';
 import {View, Text, Button, StyleSheet} from 'react-native';
-import firebase from 'firebase';
+import firebase, { firestore } from 'firebase';
 
 
 export default class Navbar extends Component {
 
-  signOut = () => {
-    firebase.auth().signOut().then(() => {
-      console.log('you are logged out');
-    })
+  constructor() {
+    super()
+    this.signOut = this.signOut.bind(this);
+  }
+
+  signOut() {
+    firebase.auth().signOut()
     .catch(error => {
       console.log(error);
     });
+    this.props.navigation.navigate('welcome');
   }
 
   render() {

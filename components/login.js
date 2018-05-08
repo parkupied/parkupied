@@ -20,6 +20,7 @@ export default class Login extends Component {
 	}
 
 	handleSubmit() {
+		// console.log("HERE", this.props);
 		const email = this.state.email;
 		const password = this.state.password;
 		firebase.auth().signInWithEmailAndPassword(email, password)

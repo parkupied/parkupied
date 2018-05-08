@@ -5,6 +5,7 @@ const { width, height } = Dimensions.get('window');
 const SCREEN_WIDTH = width;
 import firestore from '../firestore';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import Navbar from './navbar';
 
 
 export default class Map extends Component {
@@ -70,7 +71,7 @@ export default class Map extends Component {
 
 
   onRegionChangeComplete = (location) => {
-    console.log('onRegionChangeComplete', location);
+    // console.log('onRegionChangeComplete', location);
   };
 
   setRegion(location) {
@@ -82,6 +83,7 @@ export default class Map extends Component {
   render() {
 
 
+    console.log("props", this.props);
 
 
     const { location } = this.state;
@@ -90,6 +92,7 @@ export default class Map extends Component {
 
     return (
       <View style={styles.container}>
+        <Navbar navigation={this.props.navigation} />
         <MapView
           style={styles.map}
           showsUserLocation={true}
