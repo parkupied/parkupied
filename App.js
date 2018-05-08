@@ -16,7 +16,7 @@ import Login from './components/login';
 
 class App extends Component {
 	render() {
-		return(
+		return (
 			<View>
 
 				<Text>Im here</Text>
@@ -26,10 +26,11 @@ class App extends Component {
 	}
 }
 
+
 export default createStackNavigator({
 
 	signup: { screen: Signup },
-	map: { screen: Map},
+	map: { screen: Map },
 	main: { screen: mainPage },
 	home: { screen: App },
 }, 	{
