@@ -1,18 +1,40 @@
 import React, { Component } from 'react';
 import { MapView, Constants, Location, Permissions } from 'expo';
-import { StyleSheet, Text, View, Platform } from 'react-native';
+import { StyleSheet, Text, Dimensions, View, Platform, Button } from 'react-native';
+const { width, height } = Dimensions.get('window');
+const SCREEN_WIDTH = width;
+import firestore from '../firestore';
 
 
 export default class Map extends Component {
-
-  state = {
+constructor() {
+  super();
+  this.state = {
     location: null,
     errorMessage: null,
   };
+  this.handleGive = this.handleGive.bind(this);
+  this.handleLook = this.handleLook.bind(this);
 
-  componentWillMount() {
-      this._getLocationAsync();
+
+}
+componentWillMount() {
+  this._getLocationAsync();
+}
+
+handleLook(event) {
+  console.log("Looking");
+}
+
+handleGive(event) {
+  console.log("Giving");
+  firestore.collection('parkingSpots').add({
+    Coordinates: this.state.location
   }
+  );
+}
+
+
 
 
   _getLocationAsync = async () => {
@@ -63,10 +85,11 @@ export default class Map extends Component {
 
 
     return (
+      <View style={styles.container}>
       <MapView
+      style={styles.map}
       showsUserLocation={true}
       followsUserLocation={true}
-        style={{ flex: 1 }}
         initialregion={{
           latitude: 37.78825,
           longitude: -122.4324,
@@ -75,6 +98,35 @@ export default class Map extends Component {
         }}
         onRegionChangeComplete={this.onRegionChangeComplete}
       />
+      <Button
+      title="Give up Parking!"
+      onPress={this.handleGive}
+      >
+      Give up Parking!
+      </Button>
+      <Button
+      title="Look For Parking!"
+      onPress={this.handleLook}
+      >
+      Look for Parking!
+      </Button>
+        </View>
 		);
 	}
 }
+
+
+const styles = StyleSheet.create({
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  scrollview: {
+    alignItems: 'center',
+  },
+  map: {
+    width: SCREEN_WIDTH,
+    height: 500,
+  },
+});
