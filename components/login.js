@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Platform, Button } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
 import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements';
 
 // import { Constants, Location, Permissions } from 'expo';
