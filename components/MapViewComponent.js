@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Platform, Button } from 'react-native';
+import { AppRegistry, StyleSheet, Text, View, Platform, Button, Dimensions } from 'react-native';
 // import { MapView } from 'expo';
-import MapView, { Marker } from 'react-native-maps';
+import { MapView } from 'expo';
+import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 
 
 //=============== MARKERS ==============//
@@ -37,15 +38,31 @@ const fakeMarkers = [{
 
 //====================================//
 
-
+const { width, height } = Dimensions.get('window');
 
 
 export default class App extends Component {
     state = {
-        markers: []
+        markers: [],
+        userPos: {}
     }
-    handleAddUsersPosition = () => { 
+
+    handleAddUsersPosition = () => {
         alert("ADDING USERS POSITION!!")
+        let newMarker = {
+            id: this.state.markers.length + 1,
+            latlng: this.state.userPos,
+            title: 'user-position',
+            description: 'current user`s location.'
+        }
+        this.setState({ markers: this.state.markers.concat(newMarker) });
+    }
+
+    handleUserChangedlocation = (ev) => {
+        //{ coordinate: LatLng }
+        alert("======= users coords:", ev);
+        this.setState({ userPos: { latitude: 40.70494681109768, longitude: -74.00902127736411 } })
+        // this.setState({ userPos: ev.nativeEvent.coordinate })
     }
 
     componentDidMount() {
@@ -53,9 +70,15 @@ export default class App extends Component {
     }
 
     render() {
+        let LngLat = {
+            longitude: this.state.userPos.longitude,
+            latitude: this.state.userPos.latitude
+        }
+
         return (
             <View style={styles.container}>
                 <MapView
+                   // {/* provider={PROVIDER_GOOGLE} */}
                     showsUserLocation={true}
                     followsUserLocation={true}
                     showsCompass={true}
@@ -68,7 +91,9 @@ export default class App extends Component {
                         longitude: -74.009,
                         latitudeDelta: 0.00922,
                         longitudeDelta: 0.00421,
-                    }}>
+                    }}
+                    onUserLocationChange={this.handleUserChangedlocation}
+                >
 
                     {this.state.markers.map(marker => (
                         <Marker
@@ -78,13 +103,28 @@ export default class App extends Component {
                             description={marker.description}
                         />
                     ))}
+
                 </MapView>
+
+                <Text style={styles.container}>lng:{LngLat.longitude}</Text>
+                <Text style={styles.container}>lat:{LngLat.latitude}</Text>
+
                 <Button
+                    // {/* onPress={this.handleAddUsersPosition} */}
+                    onPress={this.handleUserChangedlocation}
+                    title="ChangeLocation"
+                    color="#841584"
+                    accessibilityLabel="Learn more about this purple button"
+                />
+
+                <Button
+                    // {/* onPress={this.handleAddUsersPosition} */}
                     onPress={this.handleAddUsersPosition}
                     title="AddUsersPosition"
                     color="#841584"
                     accessibilityLabel="Learn more about this purple button"
                 />
+
             </View>
         );
     }
@@ -99,6 +139,8 @@ const styles = StyleSheet.create({
     },
     map: {
         width: 350,
-        height: 600,
+        height: 500,
     },
 })
+
+// AppRegistry.registerComponent('GoogleMapPlayground', () => GoogleMapPlayground);  ????????
