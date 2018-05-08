@@ -8,42 +8,43 @@ import { MapView } from 'expo';
 import firestore from './firestore';
 
 import Signup from './components/signup';
+import MapViewComponent from './components/MapViewComponent';
 
 
 export default class App extends Component {
-  state = {
-    location: null,
-    errorMessage: null,
+	state = {
+		location: null,
+		errorMessage: null,
 	};
 
 	componentWillMount() {
-    if (Platform.OS === 'android' && !Constants.isDevice) {
-      this.setState({
-        errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
-      });
-    } else {
-      this._getLocationAsync();
-    }
-  }
-  
+		if (Platform.OS === 'android' && !Constants.isDevice) {
+			this.setState({
+				errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
+			});
+		} else {
+			this._getLocationAsync();
+		}
+	}
 
-  _getLocationAsync = async () => {
-    let { status } = await Permissions.askAsync(Permissions.LOCATION);
-    if (status !== 'granted') {
-      this.setState({
-        errorMessage: 'Permission to access location was denied',
-      });
-    }
 
-    let location = await Location.getCurrentPositionAsync({});
-    this.setState({ location });
+	_getLocationAsync = async () => {
+		let { status } = await Permissions.askAsync(Permissions.LOCATION);
+		if (status !== 'granted') {
+			this.setState({
+				errorMessage: 'Permission to access location was denied',
+			});
+		}
+
+		let location = await Location.getCurrentPositionAsync({});
+		this.setState({ location });
 	};
 
 	getLocationAsync = async () => {
 		const { Location, Permissions } = Expo;
 		const { status } = await Permissions.askAsync(Permissions.LOCATION);
 		if (status === 'granted') {
-			return Location.getCurrentPositionAsync({enableHighAccuracy: true});
+			return Location.getCurrentPositionAsync({ enableHighAccuracy: true });
 		} else {
 			throw new Error('Location permission not granted');
 		}
@@ -52,16 +53,22 @@ export default class App extends Component {
 
 	render() {
 		let text = 'Waiting..';
-    if (this.state.errorMessage) {
-      text = this.state.errorMessage;
-    } else if (this.state.location) {
-      text = JSON.stringify(this.state.location);
+		if (this.state.errorMessage) {
+			text = this.state.errorMessage;
+		} else if (this.state.location) {
+			text = JSON.stringify(this.state.location);
 		}
 
 		return (
-			<View>
-			<Signup />
-			{/* <View style={styles.buttons}>
+			<View style={styles.container}>
+
+				{/* <View style={styles.mapContainer}> */}
+				<MapViewComponent />
+				<Text>BOOOO !!!</Text>
+				{/* </View> */}
+				{/* <Signup /> */}
+
+				{/* <View style={styles.buttons}>
 				<FontAwesome.Button
 					name="facebook"
 					backgroundColor="#3b5998"
@@ -85,9 +92,15 @@ export default class App extends Component {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
+		flexDirection: 'column',
+		justifyContent: 'spaceBetween',
 		backgroundColor: '#fff',
 		alignItems: 'center',
 		justifyContent: 'center',
+	},
+	mapContainer: {
+		// flex: 1,
+		// padding: 20,
 	},
 	title: {
 		color: 'blue',
