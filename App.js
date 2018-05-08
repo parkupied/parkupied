@@ -13,7 +13,6 @@ import mainPage from './components/mainPage';
 import Login from './components/login';
 import welcome from './components/welcome';
 import Navbar from './components/navbar';
-// YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated in plain JavaScript React classes. Instead, make sure to clean up subscriptions and pending requests in componentWillUnmount to prevent memory leaks.', 'Module RCTImageLoader']);
 
 class App extends Component {
 	render() {
@@ -27,6 +26,7 @@ class App extends Component {
 	}
 }
 
+		//FUNCTION TO RESET THE STACKNAVIGATOR HISTORY. NOT BEING USED CURRENTLY
 // function resetNavigation(targetRoute) {
 // 	const resetAction = NavigationActions.reset({
 // 		index: 0,
@@ -52,4 +52,4 @@ export default createStackNavigator({
 		gesturesEnabled: false,
 	}
 });
-// this.resetNavigation('map')
+

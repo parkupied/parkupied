@@ -9,7 +9,7 @@ export default Welcome = ({ navigation }) => {
             <Text>Welcome to Parkupied. This is the first page</Text>
             <Text>You should login or sign up</Text>
             <Button title="Sign Up!" onPress={() => navigation.navigate("signup")} />
-            <Button title="Login...  (doesn't work yet)" onPress={() => navigation.navigate("login")} />
+            <Button title="Login!" onPress={() => navigation.navigate("login")} />
         </View>
     );
 }

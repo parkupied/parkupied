@@ -81,14 +81,7 @@ export default class Map extends Component {
   }
 
   render() {
-
-
-    console.log("props", this.props);
-
-
     const { location } = this.state;
-
-
 
     return (
       <View style={styles.container}>
