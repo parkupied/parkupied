@@ -7,7 +7,7 @@ import { Constants, Location, Permissions } from 'expo';
 import { MapView } from 'expo';
 
 import firestore from './firestore';
-
+import Map from './components/Map';
 import Signup from './components/signup';
 import mainPage from './components/mainPage';
 // YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated in plain JavaScript React classes. Instead, make sure to clean up subscriptions and pending requests in componentWillUnmount to prevent memory leaks.', 'Module RCTImageLoader']);
@@ -25,7 +25,8 @@ class App extends Component {
 }
 
 export default createStackNavigator({
-	home: { screen: App },
+	map: { screen: Map},
 	main: { screen: mainPage },
-	signup: { screen: Signup },
+	home: { screen: App },
+	signup: { screen: Signup }
 });
