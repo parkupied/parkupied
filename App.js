@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, Platform, YellowBox } from 'react-native';
-import { createStackNavigator } from 'react-navigation';
+import { createStackNavigator, NavigationActions } from 'react-navigation';
 import { FontAwesome } from '@expo/vector-icons';
 
 import { Constants, Location, Permissions } from 'expo';
@@ -27,6 +27,14 @@ class App extends Component {
 	}
 }
 
+// function resetNavigation(targetRoute) {
+// 	const resetAction = NavigationActions.reset({
+// 		index: 0,
+// 		actions: [ NavigationActions.navigate({ routeName: targetRoute }) ]
+// 	});
+// 	this.props.navigation.dispatch(resetAction);
+// }
+
 
 export default createStackNavigator({
 	welcome: {screen: welcome},
@@ -38,5 +46,10 @@ export default createStackNavigator({
 	home: { screen: App },
 }, 	{
 	initialRouteName: 'welcome',
-
+	navigationOptions: {
+		title: 'map',
+		headerLeft: null,
+		gesturesEnabled: false,
+	}
 });
+// this.resetNavigation('map')

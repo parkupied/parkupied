@@ -22,7 +22,7 @@ export default class Navbar extends Component {
   render() {
     return (
       <View style={styles.button}>
-      <Button onPress={this.signOut} title='LogOut'>Log Out </Button>
+      <Button onPress={this.signOut} title="Log Out" />
       </View>
     )
   }
