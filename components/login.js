@@ -1,36 +1,28 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Platform, Button } from 'react-native';
+import { StyleSheet, View, Button } from 'react-native';
 import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements';
-
-// import { Constants, Location, Permissions } from 'expo';
-
-import firestore from '../firestore';
 import firebase from 'firebase';
 
 
 export default class Login extends Component {
 
-	constructor() {
-		super();
-		this.state = {
-			email: '',
-			password: '',
-		};
-		this.handleSubmit = this.handleSubmit.bind(this);
-	}
+	state = {
+		email: '',
+		password: '',
+	};
 
-	handleSubmit() {
-		// console.log("HERE", this.props);
+
+	handleSubmit = () => {
 		const email = this.state.email;
 		const password = this.state.password;
 		firebase.auth().signInWithEmailAndPassword(email, password)
-			.then( () => {
-				this.props.navigation.navigate('map');
+			.then(() => {
+				this.props.navigation.navigate('Map');
 			})
 			.catch(error => {
 				console.log(error);
 			})
-		}
+	}
 
 	render() {
 
@@ -59,8 +51,6 @@ export default class Login extends Component {
 
 const styles = StyleSheet.create({
 	buttons: {
-		// justifyContent: 'space-between',
-		// flexDirection: 'row',
 		margin: 20,
 		marginTop: 50
 	},

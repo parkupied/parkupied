@@ -1,22 +1,16 @@
 import React, { Component } from 'react';
-import {Header} from 'react-native-elements';
-import {View, Text, Button, StyleSheet} from 'react-native';
-import firebase, { firestore } from 'firebase';
+import {View, Button, StyleSheet} from 'react-native';
+import firebase from 'firebase';
 
 
 export default class Navbar extends Component {
 
-  constructor() {
-    super()
-    this.signOut = this.signOut.bind(this);
-  }
-
-  signOut() {
+  signOut = () => {
     firebase.auth().signOut()
     .catch(error => {
       console.log(error);
     });
-    this.props.navigation.navigate('welcome');
+    this.props.navigation.navigate('Welcome');
   }
 
   render() {
@@ -31,7 +25,6 @@ export default class Navbar extends Component {
 const styles = StyleSheet.create({
   button: {
     backgroundColor: 'red',
-
   }
 })
 

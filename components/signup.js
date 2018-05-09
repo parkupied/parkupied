@@ -1,31 +1,22 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, ScrollView, View, Platform, Button } from 'react-native';
+import { StyleSheet, ScrollView, View, Button } from 'react-native';
 import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements';
 import firestore from '../firestore';
 import firebase from 'firebase';
 
-// import { Constants, Location, Permissions } from 'expo';
-
-
-
 export default class Signup extends Component {
+	state = {
+		name: '',
+		phone: '',
+		email: '',
+		password: '',
+		carMake: '',
+		carModel: '',
+		carColor: '',
+		license: '',
+	};
 
-	constructor() {
-		super();
-		this.state = {
-			name: '',
-			phone: '',
-			email: '',
-			password: '',
-			carMake: '',
-			carModel: '',
-			carColor: '',
-			license: '',
-		};
-		this.handleSubmit = this.handleSubmit.bind(this);
-	}
-
-	handleSubmit() {
+	handleSubmit = () => {
 		const name = this.state.name;
 		const phone = this.state.phone;
 		const email = this.state.email;
@@ -36,7 +27,7 @@ export default class Signup extends Component {
 		const license = this.state.license;
 
 
-		firebase.auth().createUserWithEmailAndPassword(this.state.email, this.state.password).catch(error => {
+		firebase.auth().createUserWithEmailAndPassword(email, password).catch(error => {
 			console.log(error);
 		});
 
@@ -58,7 +49,7 @@ export default class Signup extends Component {
 			matches: {},
 			pastMatches: []
 		});
-		this.props.navigation.navigate('map');
+		this.props.navigation.navigate('Map');
 	}
 
 
@@ -113,8 +104,6 @@ export default class Signup extends Component {
 
 const styles = StyleSheet.create({
 	buttons: {
-		// justifyContent: 'space-between',
-		// flexDirection: 'row',
 		margin: 20,
 		marginTop: 50
 	},

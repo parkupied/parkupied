@@ -1,15 +1,15 @@
-import React, { Component } from 'react';
-import { StyleSheet, Text, View, Platform } from 'react-native';
+import React from 'react';
+import {  Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 
-export default Welcome = ({ navigation }) => {
-
-    return (
+const Welcome = ({ navigation }) =>
+(
         <View>
             <Text>Welcome to Parkupied. This is the first page</Text>
             <Text>You should login or sign up</Text>
-            <Button title="Sign Up!" onPress={() => navigation.navigate("signup")} />
-            <Button title="Login!" onPress={() => navigation.navigate("login")} />
+            <Button title="Sign Up!" onPress={() => navigation.navigate('Signup')} />
+            <Button title="Login!" onPress={() => navigation.navigate('Login')} />
         </View>
-    );
-}
+)
+
+export default Welcome;

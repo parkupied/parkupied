@@ -5,20 +5,16 @@ const { width, height } = Dimensions.get('window');
 const SCREEN_WIDTH = width;
 import firestore from '../firestore';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import Navbar from './navbar';
+import Navbar from './Navbar';
 
 
 export default class Map extends Component {
-  constructor() {
-    super();
-    this.state = {
+
+    state = {
       location: null,
       errorMessage: null,
-      markers: [],
-      userPos: {}
+      markers: []
     }
-
-  };
 
   componentDidMount() {
     this._getLocationAsync()
@@ -44,12 +40,12 @@ export default class Map extends Component {
       })
   }
 
-  handleLook = (event) => {
+  handleLook = () => {
     console.log("Looking");
   }
 
 
-  handleGive = (event) =>  {
+  handleGive = () =>  {
     console.log("Giving");
     firestore.collection('parkingSpots')
       .add({ Coordinates: this.state.location.coords })
@@ -65,14 +61,10 @@ export default class Map extends Component {
     }
 
     let location = await Location.getCurrentPositionAsync({});
-    this.setState({ location, ready: true });
+    this.setState({ location });
   };
 
 
-
-  onRegionChangeComplete = (location) => {
-    // console.log('onRegionChangeComplete', location);
-  };
 
   setRegion(location) {
     if (this.state.ready) {
@@ -89,14 +81,7 @@ export default class Map extends Component {
         <MapView
           style={styles.map}
           showsUserLocation={true}
-          followsUserLocation={true}
-          initialregion={{
-            latitude: 37.78825,
-            longitude: -122.4324,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}
-          onRegionChangeComplete={this.onRegionChangeComplete}>
+          followsUserLocation={true}>
 
           {this.state.markers.map(marker => (
             <Marker
