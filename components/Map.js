@@ -5,16 +5,15 @@ const { width, height } = Dimensions.get('window');
 const SCREEN_WIDTH = width;
 import firestore from '../firestore';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import Navbar from './Navbar';
 
 
 export default class Map extends Component {
 
-    state = {
-      location: null,
-      errorMessage: null,
-      markers: []
-    }
+  state = {
+    location: null,
+    errorMessage: null,
+    markers: []
+  }
 
   componentDidMount() {
     this._getLocationAsync()
@@ -77,7 +76,6 @@ export default class Map extends Component {
 
     return (
       <View style={styles.container}>
-        <Navbar navigation={this.props.navigation} />
         <MapView
           style={styles.map}
           showsUserLocation={true}
@@ -85,10 +83,10 @@ export default class Map extends Component {
 
           {this.state.markers.map(marker => (
             <Marker
-              key={marker.id}
-              coordinate={marker.latlng}
-              title={marker.title}
-              description={marker.description} />
+            key={marker.id}
+            coordinate={marker.latlng}
+            title={marker.title}
+            description={marker.description} />
           ))}
 
         </MapView>
@@ -128,3 +126,5 @@ const styles = StyleSheet.create({
     height: 500,
   },
 });
+
+
