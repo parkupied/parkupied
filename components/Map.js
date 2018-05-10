@@ -5,42 +5,84 @@ const { width, height } = Dimensions.get('window');
 const SCREEN_WIDTH = width;
 import firestore from '../firestore';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-
+const key = 'AIzaSyDVmcW1my0uG8kBPgSHWvRhZozepAXqL_A';
 
 export default class Map extends Component {
 
-  state = {
-    location: null,
-    errorMessage: null,
-    markers: []
-  }
+    state = {
+      location: null,
+      errorMessage: null,
+      marker: {latitude:0,longitude:0},
+      parkingSpots: null
+    }
 
   componentDidMount() {
     this._getLocationAsync()
     firestore.collection('parkingSpots').get()
       .then(allSpots => {
         let tempMarkers = [];
+        let destinations = [];
         allSpots.forEach(spot => {
           const spotObj = spot.data().Coordinates;
           const latlng = { latitude: spotObj.latitude, longitude: spotObj.longitude };
-          const objID = spot.id;
+          const id = spot.id;
 
           let newMarker = {
-            id: objID,
-            latlng: latlng,
-            title: 'some fake title....',
-            description: 'some fake description....'
+            id,
+            latlng
           }
-
+          let newDestination = `${spotObj.latitude},${spotObj.longitude}`
           tempMarkers.push(newMarker);
+          destinations.push(newDestination);
         });
-
-        this.setState({ markers: tempMarkers });
+        destinations = destinations.join('|');
+        this.setState({ parkingSpots: destinations});
       })
   }
 
   handleLook = () => {
     console.log("Looking");
+    let origin = `${this.state.location.coords.latitude}, ${this.state.location.coords.longitude}`;
+    let destination = this.state.parkingSpots;
+
+    const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${origin}&destinations=${destination}&key=${key}`
+
+    return fetch(url)
+      .then(response => response.json())
+      .then(json => {
+				if (json.status !== 'OK') {
+					const errorMessage = json.error_message || 'Unknown error';
+					return Promise.reject(errorMessage);
+				}
+
+				if (json.rows.length) {
+
+          let fastest = json.rows[0].elements[0];
+          let counter = 0;
+          let index;
+          //Instead of looking through the rows[0], make an object with key
+          //being the address and value being time.
+          const optimalRoute = json.rows[0].elements.map((nav, idx) => {
+            counter++;
+            if (nav.duration.value < fastest.duration.value) {
+              fastest = nav; //the actual match
+              index = idx
+            }
+          })
+
+          const availableSpots = destination.split('|');
+          console.log(availableSpots);
+          const perfectCoords = availableSpots[index].split(',');
+          const finalMatch = {latitude: +perfectCoords[0], longitude: +perfectCoords[1]};
+
+
+
+          this.setState({marker: finalMatch});
+				} else {
+					return Promise.reject();
+				}
+      })
+
   }
 
 
@@ -65,15 +107,11 @@ export default class Map extends Component {
 
 
 
-  setRegion(location) {
-    if (this.state.ready) {
-      setTimeout(() => this.map.mapview.animateToRegion(location), 10);
-    }
-  }
+
 
   render() {
-    const { location } = this.state;
-
+    const { location, marker } = this.state;
+    // console.log(this.state.marker);
     return (
       <View style={styles.container}>
         <MapView
@@ -81,13 +119,18 @@ export default class Map extends Component {
           showsUserLocation={true}
           followsUserLocation={true}>
 
-          {this.state.markers.map(marker => (
+
             <Marker
+<<<<<<< HEAD
+              coordinate={marker}
+             />
+=======
             key={marker.id}
             coordinate={marker.latlng}
             title={marker.title}
             description={marker.description} />
           ))}
+>>>>>>> master
 
         </MapView>
         {
