@@ -49,7 +49,7 @@ export default class Signup extends Component {
 			matches: {},
 			pastMatches: []
 		});
-		this.props.navigation.navigate('Map');
+		this.props.navigation.navigate('Menu');
 	}
 
 

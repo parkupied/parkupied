@@ -115,7 +115,6 @@ export default class Map extends Component {
     // console.log(this.state.marker);
     return (
       <View style={styles.container}>
-        <Navbar navigation={this.props.navigation} />
         <MapView
           style={styles.map}
           showsUserLocation={true}
@@ -123,8 +122,16 @@ export default class Map extends Component {
 
 
             <Marker
+<<<<<<< HEAD
               coordinate={marker}
              />
+=======
+            key={marker.id}
+            coordinate={marker.latlng}
+            title={marker.title}
+            description={marker.description} />
+          ))}
+>>>>>>> master
 
         </MapView>
         {
@@ -163,3 +170,5 @@ const styles = StyleSheet.create({
     height: 500,
   },
 });
+
+
