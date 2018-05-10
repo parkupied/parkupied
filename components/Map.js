@@ -58,12 +58,10 @@ export default class Map extends Component {
 				if (json.rows.length) {
 
           let fastest = json.rows[0].elements[0];
-          let counter = 0;
-          let index;
+          let index = 0;
           //Instead of looking through the rows[0], make an object with key
           //being the address and value being time.
           const optimalRoute = json.rows[0].elements.map((nav, idx) => {
-            counter++;
             if (nav.duration.value < fastest.duration.value) {
               fastest = nav; //the actual match
               index = idx
@@ -71,7 +69,6 @@ export default class Map extends Component {
           })
 
           const availableSpots = destination.split('|');
-          console.log(availableSpots);
           const perfectCoords = availableSpots[index].split(',');
           const finalMatch = {latitude: +perfectCoords[0], longitude: +perfectCoords[1]};
 
