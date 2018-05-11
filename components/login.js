@@ -27,6 +27,8 @@ export default class Login extends Component {
 	render() {
 
 		return (
+			<View>
+			<Button title='Go Back' onPress={() => this.props.navigation.navigate('Welcome')} />
 			<View style={styles.buttons}>
 				<FormLabel>E-mail</FormLabel>
 				<FormInput placeholder="Please enter your email"
@@ -38,13 +40,14 @@ export default class Login extends Component {
 				/>
 				<View style={styles.buttons}>
 					<Button
-						title="login"
+						title="Login"
 						onPress={this.handleSubmit}
 					>
 						Login
 					</Button>
 				</View>
 			</View>
+		</View>
 		);
 	}
 }
