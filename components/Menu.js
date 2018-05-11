@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import { StyleSheet, Text, Dimensions, View, Platform, Button } from 'react-native';
 import Drawer from 'react-native-drawer';
 import Map from './Map';
+import { firebase } from '@firebase/app';
 
 export default class Menu extends Component {
 
   closeControlPanel = () => {
     this._drawer.close();
   }
-    
+
   openControlPanel = () => {
     this._drawer.open();
   }
@@ -28,6 +29,7 @@ export default class Menu extends Component {
           <Button onPress={() => {}} title="Watch the Fight" />
           <Button onPress={() => {}} title="Betting" />
           <Button onPress={() => {}} title="Help" />
+          <Button onPress={() => {firebase.auth().signOut().then((() => this.props.navigation.navigate('Welcome')))}} title="Logout" />
           </View>
         }
         openDrawerOffset={0.2}
