@@ -14,38 +14,34 @@ export default class Map extends Component {
       location: null,
       errorMessage: null,
       marker: {latitude:0,longitude:0},
-      parkingSpots: null
+      parkingSpots: '',
     }
 
   componentDidMount() {
     this._getLocationAsync()
-    firestore.collection('parkingSpots').get()
-      .then(allSpots => {
-        let tempMarkers = [];
-        let destinations = [];
-        allSpots.forEach(spot => {
-          const spotObj = spot.data().Coordinates;
-          const latlng = { latitude: spotObj.latitude, longitude: spotObj.longitude };
-          const id = spot.id;
+    firestore.collection('parkingSpots').onSnapshot( allSpots => {
+      let destinations = [];
+      allSpots.docChanges.forEach( spot => {
+        const spotObj = spot.doc.data().Coordinates;
 
-          let newMarker = {
-            id,
-            latlng
-          }
-          let newDestination = `${spotObj.latitude},${spotObj.longitude}`
-          tempMarkers.push(newMarker);
-          destinations.push(newDestination);
-        });
-        destinations = destinations.join('|');
-        this.setState({ parkingSpots: destinations});
+        let newDestination = `${spotObj.latitude},${spotObj.longitude}`;
+        destinations.push(newDestination);
       })
+      destinations = destinations.join('|');
+
+      const currentSpots = this.state.parkingSpots;
+      if (currentSpots.length) {
+        this.setState({ parkingSpots: `${currentSpots}|${destinations}` })
+      } else {
+        this.setState({ parkingSpots: destinations });
+      }
+    })
   }
 
   handleLook = () => {
     console.log("Looking");
     let origin = `${this.state.location.coords.latitude}, ${this.state.location.coords.longitude}`;
     let destination = this.state.parkingSpots;
-    console.log("USER: ", firebase.auth().currentUser.email);
 
     firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).get()
       .then(allusers => {
@@ -82,7 +78,6 @@ export default class Map extends Component {
           const finalMatch = {latitude: +perfectCoords[0], longitude: +perfectCoords[1]};
 
 
-
           this.setState({marker: finalMatch});
 				} else {
 					return Promise.reject();
@@ -95,7 +90,10 @@ export default class Map extends Component {
   handleGive = () =>  {
     console.log("Giving");
     firestore.collection('parkingSpots')
-      .add({ Coordinates: this.state.location.coords })
+      .add({
+        Coordinates: this.state.location.coords,
+        email: firebase.auth().currentUser.email,
+      });
   }
 
 
