@@ -77,7 +77,6 @@ export default class Map extends Component {
           const perfectCoords = availableSpots[index].split(',');
           const finalMatch = {latitude: +perfectCoords[0], longitude: +perfectCoords[1]};
 
-
           this.setState({marker: finalMatch});
 				} else {
 					return Promise.reject();
@@ -94,6 +93,24 @@ export default class Map extends Component {
         Coordinates: this.state.location.coords,
         email: firebase.auth().currentUser.email,
       });
+
+    // Firestore should listen for a snapshot (change) in your match property
+    var unsubscribe = firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot( snap => {
+      snap.docChanges.forEach(user => {
+        console.log(">>>>>>>", user.doc.data());
+        if (user.matches !== {}) {
+          firestore.collection("users").where("email","==", user.matches.email).get()
+          .then(allusers => { // this should really only be one user.
+            allusers.forEach(user => {
+              console.log(user.data().email);
+            })
+          })
+        };
+      })
+    })
+    // And then do whatever
+    // And then stop listening
+    unsubscribe();
   }
 
 
@@ -109,9 +126,10 @@ export default class Map extends Component {
     this.setState({ location });
   };
 
-
-
-
+  onRegionChangeComplete (location) {
+    console.log("onRegionChangeComplete: ", location);
+    // Tell Firestore to update ??
+  }
 
   render() {
     const { location, marker } = this.state;
@@ -121,13 +139,12 @@ export default class Map extends Component {
         <MapView
           style={styles.map}
           showsUserLocation={true}
-          followsUserLocation={true}>
-
+          followsUserLocation={true}
+          onRegionChangeComplete={this.onRegionChangeComplete}>
 
             <Marker
               coordinate={marker}
              />
-
         </MapView>
         {
           this.state.location &&
