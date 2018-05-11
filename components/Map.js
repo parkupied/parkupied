@@ -5,6 +5,7 @@ const { width, height } = Dimensions.get('window');
 const SCREEN_WIDTH = width;
 import firestore from '../firestore';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { firebase } from '@firebase/app';
 const key = 'AIzaSyDVmcW1my0uG8kBPgSHWvRhZozepAXqL_A';
 
 export default class Map extends Component {
@@ -44,6 +45,19 @@ export default class Map extends Component {
     console.log("Looking");
     let origin = `${this.state.location.coords.latitude}, ${this.state.location.coords.longitude}`;
     let destination = this.state.parkingSpots;
+    console.log("USER: ", firebase.auth().currentUser.email);
+
+    firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).get()
+      .then(allusers => {
+        // //console.log(allusers);
+        // console.log(Object.keys(allusers));
+        // // console.log(allusers._firestore);
+        // console.log(Object.keys(allusers._firestore));
+        // console.log(allusers._firestore.INTERNAL);
+        allusers.forEach(user => {
+          console.log(user.data().email);
+        })
+      })
 
     const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${origin}&destinations=${destination}&key=${key}`
 

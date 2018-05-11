@@ -16,7 +16,7 @@ export default class Signup extends Component {
 		license: '',
 	};
 
-	handleSubmit = () => {
+	handleSubmit = async () => {
 		const name = this.state.name;
 		const phone = this.state.phone;
 		const email = this.state.email;
@@ -27,11 +27,11 @@ export default class Signup extends Component {
 		const license = this.state.license;
 
 
-		firebase.auth().createUserWithEmailAndPassword(email, password).catch(error => {
+		await firebase.auth().createUserWithEmailAndPassword(email, password).catch(error => {
 			console.log(error);
 		});
 
-		firestore.collection('users').add({
+		await firestore.collection('users').add({
 			name,
 			phone,
 			email,
@@ -49,7 +49,7 @@ export default class Signup extends Component {
 			matches: {},
 			pastMatches: []
 		});
-		this.props.navigation.navigate('Menu');
+		await this.props.navigation.navigate('Menu');
 	}
 
 
