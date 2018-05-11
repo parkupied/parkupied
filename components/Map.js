@@ -49,11 +49,6 @@ export default class Map extends Component {
 
     firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).get()
       .then(allusers => {
-        // //console.log(allusers);
-        // console.log(Object.keys(allusers));
-        // // console.log(allusers._firestore);
-        // console.log(Object.keys(allusers._firestore));
-        // console.log(allusers._firestore.INTERNAL);
         allusers.forEach(user => {
           console.log(user.data().email);
         })
