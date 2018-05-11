@@ -5,6 +5,7 @@ import { Button } from 'react-native-elements';
 
 import Drawer from 'react-native-drawer';
 import Map from './Map';
+import { firebase } from '@firebase/app';
 
 export default class Menu extends Component {
 
@@ -55,6 +56,10 @@ export default class Menu extends Component {
               buttonStyle={drawerStyles.drawerButtonStyle}
               onPress={() => { }}
               title="Help" />
+            <Button
+              buttonStyle={drawerStyles.drawerButtonStyle}
+              onPress={() => { firebase.auth().signOut().then((() => this.props.navigation.navigate('Welcome'))) }}
+              title="Logout" />
           </View>
         }
         openDrawerOffset={0.2}
@@ -64,6 +69,7 @@ export default class Menu extends Component {
         styles={drawerStyles}
       >
         <Map />
+
         <View style={drawerStyles.callDrawerContainer}>
           <Button
             buttonStyle={drawerStyles.drawerButtonStyle}
@@ -77,22 +83,26 @@ export default class Menu extends Component {
 }
 
 const drawerStyles = {
+  
   drawer: {
     shadowColor: '#0000ff',
     shadowOpacity: 0.5,
     shadowRadius: 10
   },
+
   button: {
     padding: 5,
-    // marginTop: 150,
     flex: 1,
     justifyContent: 'space-evenly',
     alignItems: 'center',
     backgroundColor: '#aabbdd',
   },
+
   callDrawerContainer: {
-    flex: 1,
+    padding: 40,
+    alignItems: 'center',
   },
+
   drawerButtonStyle: {
     backgroundColor: "rgba(92, 99,216, 1)",
     width: 200,
