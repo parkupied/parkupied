@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { MapView, Constants, Location, Permissions } from 'expo';
-import { StyleSheet, Text, Dimensions, View, Platform, Button } from 'react-native';
+import { StyleSheet, Text, Dimensions, View, Platform } from 'react-native';
+import { Button } from 'react-native-elements';
 const { width, height } = Dimensions.get('window');
 const SCREEN_WIDTH = width;
 import firestore from '../firestore';
@@ -156,9 +157,10 @@ export default class Map extends Component {
     const { location, marker, matchedMarker } = this.state;
     return (
       <View style={styles.container}>
-        <MapView
-          style={styles.map}
+
+        <MapView style={styles.map}
           showsUserLocation={true}
+
           followsUserLocation={true}
           onRegionChangeComplete={this.onRegionChangeComplete}>
         {marker.latitude ?  <Marker
@@ -195,16 +197,33 @@ export default class Map extends Component {
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+    top: 25,
   },
+
   scrollview: {
     alignItems: 'center',
   },
+
   map: {
-    width: SCREEN_WIDTH,
-    height: 500,
+    flex: 1,
   },
+
+  buttonsMapContainer: {
+    backgroundColor: '#aabbff',
+    width: 400,
+    height: 100,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  button: {
+    borderColor: "white",
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 2,
+    backgroundColor: '#aabbff',
+  }
 });
 
 
