@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { MapView, Constants, Location, Permissions } from 'expo';
-import { StyleSheet, Text, Dimensions, View, Platform, Button } from 'react-native';
+import { StyleSheet, Text, Dimensions, View, Platform } from 'react-native';
+import { Button } from 'react-native-elements';
 const { width, height } = Dimensions.get('window');
 const SCREEN_WIDTH = width;
 import firestore from '../firestore';
@@ -10,18 +11,18 @@ const key = 'AIzaSyDVmcW1my0uG8kBPgSHWvRhZozepAXqL_A';
 
 export default class Map extends Component {
 
-    state = {
-      location: null,
-      errorMessage: null,
-      marker: {latitude:0,longitude:0},
-      parkingSpots: '',
-    }
+  state = {
+    location: null,
+    errorMessage: null,
+    marker: { latitude: 0, longitude: 0 },
+    parkingSpots: '',
+  }
 
   componentDidMount() {
     this._getLocationAsync()
-    firestore.collection('parkingSpots').onSnapshot( allSpots => {
+    firestore.collection('parkingSpots').onSnapshot(allSpots => {
       let destinations = [];
-      allSpots.docChanges.forEach( spot => {
+      allSpots.docChanges.forEach(spot => {
         const spotObj = spot.doc.data().Coordinates;
 
         let newDestination = `${spotObj.latitude},${spotObj.longitude}`;
@@ -55,12 +56,12 @@ export default class Map extends Component {
     return fetch(url)
       .then(response => response.json())
       .then(json => {
-				if (json.status !== 'OK') {
-					const errorMessage = json.error_message || 'Unknown error';
-					return Promise.reject(errorMessage);
-				}
+        if (json.status !== 'OK') {
+          const errorMessage = json.error_message || 'Unknown error';
+          return Promise.reject(errorMessage);
+        }
 
-				if (json.rows.length) {
+        if (json.rows.length) {
 
           let fastest = json.rows[0].elements[0];
           let index = 0;
@@ -75,19 +76,19 @@ export default class Map extends Component {
 
           const availableSpots = destination.split('|');
           const perfectCoords = availableSpots[index].split(',');
-          const finalMatch = {latitude: +perfectCoords[0], longitude: +perfectCoords[1]};
+          const finalMatch = { latitude: +perfectCoords[0], longitude: +perfectCoords[1] };
 
 
-          this.setState({marker: finalMatch});
-				} else {
-					return Promise.reject();
-				}
+          this.setState({ marker: finalMatch });
+        } else {
+          return Promise.reject();
+        }
       })
 
   }
 
 
-  handleGive = () =>  {
+  handleGive = () => {
     console.log("Giving");
     firestore.collection('parkingSpots')
       .add({
@@ -115,36 +116,34 @@ export default class Map extends Component {
 
   render() {
     const { location, marker } = this.state;
-    // console.log(this.state.marker);
+
     return (
       <View style={styles.container}>
-        <MapView
-          style={styles.map}
+
+        <MapView style={styles.map}
           showsUserLocation={true}
           followsUserLocation={true}>
 
-
-            <Marker
-              coordinate={marker}
-             />
+          <Marker coordinate={marker} />
 
         </MapView>
-        {
-          this.state.location &&
-          <Text>{this.state.location.latitude}
-            {this.state.location.longitude}
-          </Text>
-        }
-        <Button
-          title="Give up Parking!"
-          onPress={this.handleGive}>
-          Give up Parking!
-        </Button>
-        <Button
-          title="Look For Parking!"
-          onPress={this.handleLook}>
-          Look for Parking!
-        </Button>
+
+        <View style={styles.buttonsMapContainer}>
+
+          <Button style={styles.button}
+            title="Give up Parking!"
+            onPress={this.handleGive}>
+            Give up Parking!
+          </Button>
+
+          <Button style={styles.button}
+            title="Look For Parking!"
+            onPress={this.handleLook}>
+            Look for Parking!
+          </Button>
+
+        </View>
+
       </View>
     );
   }
@@ -154,16 +153,33 @@ export default class Map extends Component {
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+    top: 25,
   },
+
   scrollview: {
     alignItems: 'center',
   },
+
   map: {
-    width: SCREEN_WIDTH,
-    height: 500,
+    flex: 1,
   },
+
+  buttonsMapContainer: {
+    backgroundColor: '#aabbff',
+    width: 400,
+    height: 100,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  button: {
+    borderColor: "white",
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 2,
+    backgroundColor: '#aabbff',
+  }
 });
 
 
