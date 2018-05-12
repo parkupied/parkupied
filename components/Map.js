@@ -6,25 +6,27 @@ const SCREEN_WIDTH = width;
 import firestore from '../firestore';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { firebase } from '@firebase/app';
-import { match } from 'minimatch';
 const key = 'AIzaSyDVmcW1my0uG8kBPgSHWvRhZozepAXqL_A';
 
 export default class Map extends Component {
 
-    state = {
-      location: null,
-      errorMessage: null,
-      marker: {latitude:0,longitude:0},
-      parkingSpots: '',
-      emails: []
-    }
+  state = {
+    location: null,
+    errorMessage: null,
+    marker: { latitude: null, longitude: null },
+    matchedMarker: { latitude: null, longitude: null },
+    parkingSpots: '',
+    emails: [],
+    showGive: true,
+    showLook: true
+  }
 
   componentDidMount() {
     this._getLocationAsync()
-    firestore.collection('parkingSpots').onSnapshot( allSpots => {
+    firestore.collection('parkingSpots').onSnapshot(allSpots => {
       let destinations = [];
       let emails = [];
-      allSpots.docChanges.forEach( spot => {
+      allSpots.docChanges.forEach(spot => {
         const spotObj = spot.doc.data().Coordinates;
         const email = spot.doc.data().email;
         let newDestination = `${spotObj.latitude},${spotObj.longitude}`;
@@ -43,27 +45,23 @@ export default class Map extends Component {
   }
 
   handleLook = () => {
+    this.setState({ showLook: false, showGive: false });
     console.log("Looking");
     let origin = `${this.state.location.coords.latitude}, ${this.state.location.coords.longitude}`;
     let destination = this.state.parkingSpots;
-    // firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).get()
-    //   .then(allusers => {
-    //     allusers.forEach(user => {
-    //       console.log(user.data().email);
-    //     })
-    //   })
+
 
     const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${origin}&destinations=${destination}&key=${key}`
 
     return fetch(url)
       .then(response => response.json())
       .then(json => {
-				if (json.status !== 'OK') {
-					const errorMessage = json.error_message || 'Unknown error';
-					return Promise.reject(errorMessage);
-				}
+        if (json.status !== 'OK') {
+          const errorMessage = json.error_message || 'Unknown error';
+          return Promise.reject(errorMessage);
+        }
 
-				if (json.rows.length) {
+        if (json.rows.length) {
 
           let fastest = json.rows[0].elements[0];
           let index = 0;
@@ -78,36 +76,34 @@ export default class Map extends Component {
 
           const availableSpots = destination.split('|');
           const perfectCoords = availableSpots[index].split(',');
-          const finalMatch = {latitude: +perfectCoords[0], longitude: +perfectCoords[1]};
+          const finalMatch = { latitude: +perfectCoords[0], longitude: +perfectCoords[1] };
           const matchingEmail = this.state.emails[index];
-          this.setState({marker: finalMatch});
+          this.setState({ marker: finalMatch });
           const currUserEmail = firebase.auth().currentUser.email;
-          // console.log("FUCK1", currUserEmail);
-          // console.log("FUCKFACE2", matchingEmail);
-          //Finds the users who's parking spot we've matched with
-        //   firestore.collection('users').where('email', '==', matchingEmail).get().then(allUsers => {
-        //     allUsers.forEach(user => {
-        //       const id = user.id;
-        //       //Updates your data with matched user email
-        //       firestore.collection('users').doc(id).update({ matches: "fuck u"})
-        //     })
-        //   })
-        //   firestore.collection('users').where('email', '==', currUserEmail).get().then(allUsers => {
-        //     allUsers.forEach(user => {
-        //       const id = user.id;
-        //       firestore.collection('users').doc(id).update({ matches: "fuckoffputa" });
-        //     })
-        //   })
-				// } else {
-				// 	return Promise.reject();
-				// }
+          // Finds the users who's parking spot we've matched with
+          firestore.collection('users').where('email', '==', matchingEmail).get().then(allUsers => {
+            allUsers.forEach(user => {
+              const id = user.id;
+              //Updates your data with matched user email
+              firestore.collection('users').doc(id).update({ matches: { email: currUserEmail, location: this.state.location.coords } })
+            })
+          })
+          firestore.collection('users').where('email', '==', currUserEmail).get().then(allUsers => {
+            allUsers.forEach(user => {
+              const id = user.id;
+              firestore.collection('users').doc(id).update({ matches: { email: matchingEmail } });
+            })
+          })
+        } else {
+          return Promise.reject();
+        }
       })
 
 
   }
 
 
-  handleGive = () =>  {
+  handleGive = () => {
     console.log("Giving");
     firestore.collection('parkingSpots')
       .add({
@@ -116,22 +112,26 @@ export default class Map extends Component {
       });
 
     // Firestore should listen for a snapshot (change) in your match property
-    var unsubscribe = firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot( snap => {
+    var unsubscribe = firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot(snap => {
       snap.docChanges.forEach(user => {
-        console.log(">>>>>>>", user.doc.data());
         if (user.doc.data().matches !== {}) {
-          firestore.collection("users").where("email","==", user.matches.email).get()
-          .then(allusers => { // this should really only be one user.
-            allusers.forEach(user => {
-              console.log( user.data());
+          firestore.collection("users").where("email", "==", user.matches.email).get()
+            .then(allusers => { // this should really only be one user.
+              allusers.forEach(user => {
+                let lat = user.matches.location.latitude;
+                let long = user.matches.location.longitude;
+                let coords = {latitude: lat, longitude: long};
+                this.setState({ matchedMarker: coords})
+                //Display something to the user. "Match Found!""
+              })
             })
-          })
         };
       })
     })
     // And then do whatever
     // And then stop listening
-    // unsubscribe();
+    unsubscribe();
+    this.setState({ showGive: false, showLook: false })
   }
 
 
@@ -147,13 +147,13 @@ export default class Map extends Component {
     this.setState({ location });
   };
 
-  onRegionChangeComplete (location) {
+  onRegionChangeComplete(location) {
     // console.log("onRegionChangeComplete: ", location);
     // Tell Firestore to update ??
   }
 
   render() {
-    const { location, marker } = this.state;
+    const { location, marker, matchedMarker } = this.state;
     return (
       <View style={styles.container}>
         <MapView
@@ -161,10 +161,13 @@ export default class Map extends Component {
           showsUserLocation={true}
           followsUserLocation={true}
           onRegionChangeComplete={this.onRegionChangeComplete}>
+        {marker.latitude ?  <Marker
+          coordinate={marker}
+        /> : null }
+        {matchedMarker.latitude ?  <Marker
+          coordinate={matchedMarker}
+        /> : null }
 
-            <Marker
-              coordinate={marker}
-             />
         </MapView>
         {
           this.state.location &&
@@ -172,16 +175,17 @@ export default class Map extends Component {
             {this.state.location.longitude}
           </Text>
         }
-        <Button
+        {this.state.showGive ? <Button
           title="Give up Parking!"
           onPress={this.handleGive}>
           Give up Parking!
-        </Button>
-        <Button
+        </Button> : null}
+        {this.state.showLook ?  <Button
           title="Look For Parking!"
           onPress={this.handleLook}>
           Look for Parking!
-        </Button>
+        </Button> : null}
+
       </View>
     );
   }
