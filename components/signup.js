@@ -56,6 +56,8 @@ export default class Signup extends Component {
 	render() {
 
 		return (
+			<View>
+			<Button style={styles.backButton} title='Go Back' onPress={() => this.props.navigation.navigate('Welcome')} />
 			<ScrollView style={styles.buttons}>
 				<FormLabel>Full Name</FormLabel>
 				<FormInput placeholder="Please enter your full name"
@@ -91,13 +93,12 @@ export default class Signup extends Component {
 				/>
 				<View style={styles.buttons}>
 					<Button
-						title="signup"
+						title="Signup"
 						onPress={this.handleSubmit}
-					>
-						Signup
-					</Button>
+					/>
 				</View>
 			</ScrollView>
+			</View>
 		);
 	}
 }
@@ -107,5 +108,8 @@ const styles = StyleSheet.create({
 		margin: 20,
 		marginTop: 50
 	},
+	backButton: {
+		marginTop: 'auto'
+	}
 });
 
