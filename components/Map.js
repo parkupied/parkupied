@@ -14,19 +14,25 @@ export default class Map extends Component {
   state = {
     location: null,
     errorMessage: null,
-    marker: { latitude: 0, longitude: 0 },
+    marker: { latitude: null, longitude: null },
+    matchedMarker: { latitude: null, longitude: null },
     parkingSpots: '',
+    emails: [],
+    showGive: true,
+    showLook: true
   }
 
   componentDidMount() {
     this._getLocationAsync()
     firestore.collection('parkingSpots').onSnapshot(allSpots => {
       let destinations = [];
+      let emails = [];
       allSpots.docChanges.forEach(spot => {
         const spotObj = spot.doc.data().Coordinates;
-
+        const email = spot.doc.data().email;
         let newDestination = `${spotObj.latitude},${spotObj.longitude}`;
         destinations.push(newDestination);
+        emails.push(email)
       })
       destinations = destinations.join('|');
 
@@ -34,22 +40,17 @@ export default class Map extends Component {
       if (currentSpots.length) {
         this.setState({ parkingSpots: `${currentSpots}|${destinations}` })
       } else {
-        this.setState({ parkingSpots: destinations });
+        this.setState({ parkingSpots: destinations, emails });
       }
     })
   }
 
   handleLook = () => {
+    this.setState({ showLook: false, showGive: false });
     console.log("Looking");
     let origin = `${this.state.location.coords.latitude}, ${this.state.location.coords.longitude}`;
     let destination = this.state.parkingSpots;
 
-    firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).get()
-      .then(allusers => {
-        allusers.forEach(user => {
-          console.log(user.data().email);
-        })
-      })
 
     const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${origin}&destinations=${destination}&key=${key}`
 
@@ -77,12 +78,28 @@ export default class Map extends Component {
           const availableSpots = destination.split('|');
           const perfectCoords = availableSpots[index].split(',');
           const finalMatch = { latitude: +perfectCoords[0], longitude: +perfectCoords[1] };
-
-          this.setState({marker: finalMatch});
-				} else {
-					return Promise.reject();
-				}
+          const matchingEmail = this.state.emails[index];
+          this.setState({ marker: finalMatch });
+          const currUserEmail = firebase.auth().currentUser.email;
+          // Finds the users who's parking spot we've matched with
+          firestore.collection('users').where('email', '==', matchingEmail).get().then(allUsers => {
+            allUsers.forEach(user => {
+              const id = user.id;
+              //Updates your data with matched user email
+              firestore.collection('users').doc(id).update({ matches: { email: currUserEmail, location: this.state.location.coords } })
+            })
+          })
+          firestore.collection('users').where('email', '==', currUserEmail).get().then(allUsers => {
+            allUsers.forEach(user => {
+              const id = user.id;
+              firestore.collection('users').doc(id).update({ matches: { email: matchingEmail } });
+            })
+          })
+        } else {
+          return Promise.reject();
+        }
       })
+
 
   }
 
@@ -96,22 +113,26 @@ export default class Map extends Component {
       });
 
     // Firestore should listen for a snapshot (change) in your match property
-    var unsubscribe = firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot( snap => {
+    var unsubscribe = firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot(snap => {
       snap.docChanges.forEach(user => {
-        console.log(">>>>>>>", user.doc.data());
-        if (user.matches !== {}) {
-          firestore.collection("users").where("email","==", user.matches.email).get()
-          .then(allusers => { // this should really only be one user.
-            allusers.forEach(user => {
-              console.log(user.data().email);
+        if (user.doc.data().matches !== {}) {
+          firestore.collection("users").where("email", "==", user.matches.email).get()
+            .then(allusers => { // this should really only be one user.
+              allusers.forEach(user => {
+                let lat = user.matches.location.latitude;
+                let long = user.matches.location.longitude;
+                let coords = {latitude: lat, longitude: long};
+                this.setState({ matchedMarker: coords})
+                //Display something to the user. "Match Found!""
+              })
             })
-          })
         };
       })
     })
     // And then do whatever
     // And then stop listening
     unsubscribe();
+    this.setState({ showGive: false, showLook: false })
   }
 
 
@@ -127,43 +148,45 @@ export default class Map extends Component {
     this.setState({ location });
   };
 
-  onRegionChangeComplete (location) {
-    console.log("onRegionChangeComplete: ", location);
-    // Tell Firestore to update ?
+  onRegionChangeComplete(location) {
+    // console.log("onRegionChangeComplete: ", location);
+    // Tell Firestore to update ??
   }
 
   render() {
-    const { location, marker } = this.state;
-
+    const { location, marker, matchedMarker } = this.state;
     return (
       <View style={styles.container}>
 
         <MapView style={styles.map}
           showsUserLocation={true}
-      
+
           followsUserLocation={true}
           onRegionChangeComplete={this.onRegionChangeComplete}>
+        {marker.latitude ?  <Marker
+          coordinate={marker}
+        /> : null }
+        {matchedMarker.latitude ?  <Marker
+          coordinate={matchedMarker}
+        /> : null }
 
-            <Marker
-              coordinate={marker}
-             />
         </MapView>
-
-        <View style={styles.buttonsMapContainer}>
-
-          <Button style={styles.button}
-            title="Give up Parking!"
-            onPress={this.handleGive}>
-            Give up Parking!
-          </Button>
-
-          <Button style={styles.button}
-            title="Look For Parking!"
-            onPress={this.handleLook}>
-            Look for Parking!
-          </Button>
-
-        </View>
+        {
+          this.state.location &&
+          <Text>{this.state.location.latitude}
+            {this.state.location.longitude}
+          </Text>
+        }
+        {this.state.showGive ? <Button
+          title="Give up Parking!"
+          onPress={this.handleGive}>
+          Give up Parking!
+        </Button> : null}
+        {this.state.showLook ?  <Button
+          title="Look For Parking!"
+          onPress={this.handleLook}>
+          Look for Parking!
+        </Button> : null}
 
       </View>
     );
