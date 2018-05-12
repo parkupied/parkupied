@@ -128,7 +128,7 @@ export default class Map extends Component {
 
   onRegionChangeComplete (location) {
     console.log("onRegionChangeComplete: ", location);
-    // Tell Firestore to update ??
+    // Tell Firestore to update ?
   }
 
   render() {
