@@ -6,6 +6,7 @@ const SCREEN_WIDTH = width;
 import firestore from '../firestore';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { firebase } from '@firebase/app';
+import { match } from 'minimatch';
 const key = 'AIzaSyDVmcW1my0uG8kBPgSHWvRhZozepAXqL_A';
 
 export default class Map extends Component {
@@ -15,17 +16,20 @@ export default class Map extends Component {
       errorMessage: null,
       marker: {latitude:0,longitude:0},
       parkingSpots: '',
+      emails: []
     }
 
   componentDidMount() {
     this._getLocationAsync()
     firestore.collection('parkingSpots').onSnapshot( allSpots => {
       let destinations = [];
+      let emails = [];
       allSpots.docChanges.forEach( spot => {
         const spotObj = spot.doc.data().Coordinates;
-
+        const email = spot.doc.data().email;
         let newDestination = `${spotObj.latitude},${spotObj.longitude}`;
         destinations.push(newDestination);
+        emails.push(email)
       })
       destinations = destinations.join('|');
 
@@ -33,7 +37,7 @@ export default class Map extends Component {
       if (currentSpots.length) {
         this.setState({ parkingSpots: `${currentSpots}|${destinations}` })
       } else {
-        this.setState({ parkingSpots: destinations });
+        this.setState({ parkingSpots: destinations, emails });
       }
     })
   }
@@ -42,13 +46,12 @@ export default class Map extends Component {
     console.log("Looking");
     let origin = `${this.state.location.coords.latitude}, ${this.state.location.coords.longitude}`;
     let destination = this.state.parkingSpots;
-
-    firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).get()
-      .then(allusers => {
-        allusers.forEach(user => {
-          console.log(user.data().email);
-        })
-      })
+    // firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).get()
+    //   .then(allusers => {
+    //     allusers.forEach(user => {
+    //       console.log(user.data().email);
+    //     })
+    //   })
 
     const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${origin}&destinations=${destination}&key=${key}`
 
@@ -76,12 +79,30 @@ export default class Map extends Component {
           const availableSpots = destination.split('|');
           const perfectCoords = availableSpots[index].split(',');
           const finalMatch = {latitude: +perfectCoords[0], longitude: +perfectCoords[1]};
-
+          const matchingEmail = this.state.emails[index];
           this.setState({marker: finalMatch});
-				} else {
-					return Promise.reject();
-				}
+          const currUserEmail = firebase.auth().currentUser.email;
+          // console.log("FUCK1", currUserEmail);
+          // console.log("FUCKFACE2", matchingEmail);
+          //Finds the users who's parking spot we've matched with
+        //   firestore.collection('users').where('email', '==', matchingEmail).get().then(allUsers => {
+        //     allUsers.forEach(user => {
+        //       const id = user.id;
+        //       //Updates your data with matched user email
+        //       firestore.collection('users').doc(id).update({ matches: "fuck u"})
+        //     })
+        //   })
+        //   firestore.collection('users').where('email', '==', currUserEmail).get().then(allUsers => {
+        //     allUsers.forEach(user => {
+        //       const id = user.id;
+        //       firestore.collection('users').doc(id).update({ matches: "fuckoffputa" });
+        //     })
+        //   })
+				// } else {
+				// 	return Promise.reject();
+				// }
       })
+
 
   }
 
@@ -98,11 +119,11 @@ export default class Map extends Component {
     var unsubscribe = firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot( snap => {
       snap.docChanges.forEach(user => {
         console.log(">>>>>>>", user.doc.data());
-        if (user.matches !== {}) {
+        if (user.doc.data().matches !== {}) {
           firestore.collection("users").where("email","==", user.matches.email).get()
           .then(allusers => { // this should really only be one user.
             allusers.forEach(user => {
-              console.log(user.data().email);
+              console.log( user.data());
             })
           })
         };
@@ -110,7 +131,7 @@ export default class Map extends Component {
     })
     // And then do whatever
     // And then stop listening
-    unsubscribe();
+    // unsubscribe();
   }
 
 
@@ -127,13 +148,12 @@ export default class Map extends Component {
   };
 
   onRegionChangeComplete (location) {
-    console.log("onRegionChangeComplete: ", location);
+    // console.log("onRegionChangeComplete: ", location);
     // Tell Firestore to update ??
   }
 
   render() {
     const { location, marker } = this.state;
-    // console.log(this.state.marker);
     return (
       <View style={styles.container}>
         <MapView
