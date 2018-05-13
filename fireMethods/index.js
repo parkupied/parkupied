@@ -39,10 +39,10 @@ async function signup (name, phone, email, password, carMake, carModel, carColor
 }
 
 // Login
-function login (email, password) {
+async function login (email, password) {
     email = email.toLowerCase();
     let exists = false;
-    firestore.collection("users").where("email", "==", email).get()
+    await firestore.collection("users").where("email", "==", email).get()
         .then(allUsers => {
             allUsers.forEach(user => {
                 exists = true;
@@ -59,3 +59,4 @@ function login (email, password) {
     }
 }
 
+export { signup,login };
