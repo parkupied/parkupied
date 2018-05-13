@@ -31,10 +31,6 @@ export default class Menu extends Component {
             <Button
               buttonStyle={drawerStyles.drawerButtonStyle}
               onPress={() => { }}
-              title="Donate" />
-            <Button
-              buttonStyle={drawerStyles.drawerButtonStyle}
-              onPress={() => { }}
               title="Legal" />
             <Button
               buttonStyle={drawerStyles.drawerButtonStyle}
@@ -47,14 +43,6 @@ export default class Menu extends Component {
             <Button
               buttonStyle={drawerStyles.drawerButtonStyle}
               onPress={() => { }}
-              title="Watch the Fight" />
-            <Button
-              buttonStyle={drawerStyles.drawerButtonStyle}
-              onPress={() => { }}
-              title="Betting" />
-            <Button
-              buttonStyle={drawerStyles.drawerButtonStyle}
-              onPress={() => { }}
               title="Help" />
             <Button
               buttonStyle={drawerStyles.drawerButtonStyle}
@@ -62,18 +50,18 @@ export default class Menu extends Component {
               title="Logout" />
           </View>
         }
-        openDrawerOffset={0.2}
+        openDrawerOffset={0.3}
         panCloseMask={0.2}
         closedDrawerOffset={-3}
         ref={(ref) => this._drawer = ref}
-        styles={drawerStyles}
+        style={drawerStyles.drawer}
       >
         <Map />
 
         <View style={drawerStyles.callDrawerContainer}>
           <Button
-            buttonStyle={drawerStyles.drawerButtonStyle}
-            title="Open Drawer"
+            buttonStyle={drawerStyles.menuButtonStyle}
+            title="Menu"
             onPress={this.openControlPanel}
           />
         </View>
@@ -83,33 +71,41 @@ export default class Menu extends Component {
 }
 
 const drawerStyles = {
-  
+
   drawer: {
-    shadowColor: '#0000ff',
+    backgroundColor: '#000000',
     shadowOpacity: 0.5,
-    shadowRadius: 10
+    shadowRadius: 10,
   },
 
   button: {
-    padding: 5,
+    padding: 1,
     flex: 1,
     justifyContent: 'space-evenly',
     alignItems: 'center',
-    backgroundColor: '#aabbdd',
+    backgroundColor: '#FFFFFF',
   },
 
   callDrawerContainer: {
-    padding: 40,
-    alignItems: 'center',
+    padding: 25
   },
 
   drawerButtonStyle: {
-    backgroundColor: "rgba(92, 99,216, 1)",
-    width: 200,
+    backgroundColor: "#C0C0C0",
+    width: 150,
     height: 45,
     borderColor: "white",
     borderWidth: 1,
     borderRadius: 5,
-    padding: 5,
+    padding: 5
+  },
+  menuButtonStyle: {
+    backgroundColor: "rgba(48,48,48,1)",
+    width: 100,
+    height: 45,
+    borderColor: "white",
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 5
   }
 }

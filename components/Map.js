@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { MapView, Constants, Location, Permissions } from 'expo';
-import { StyleSheet, Text, Dimensions, View, Platform } from 'react-native';
+import { StyleSheet, Text, Dimensions, View, Platform, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
 const { width, height } = Dimensions.get('window');
 const SCREEN_WIDTH = width;
@@ -19,7 +19,9 @@ export default class Map extends Component {
     parkingSpots: '',
     emails: [],
     showGive: true,
-    showLook: true
+    showLook: true,
+    showMatch: false,
+    possibleMatch: {}
   }
 
   componentDidMount() {
@@ -79,33 +81,41 @@ export default class Map extends Component {
           const perfectCoords = availableSpots[index].split(',');
           const finalMatch = { latitude: +perfectCoords[0], longitude: +perfectCoords[1] };
           const matchingEmail = this.state.emails[index];
-          this.setState({ marker: finalMatch });
-          const currUserEmail = firebase.auth().currentUser.email;
+          this.setState({ showMatch: true, possibleMatch: { coordinates: finalMatch, matchingEmail } });
           // Finds the users who's parking spot we've matched with
-          firestore.collection('users').where('email', '==', matchingEmail).get().then(allUsers => {
-            allUsers.forEach(user => {
-              const id = user.id;
-              //Updates your data with matched user email
-              firestore.collection('users').doc(id).update({ matches: { email: currUserEmail, location: this.state.location.coords } })
-            })
-          })
-          firestore.collection('users').where('email', '==', currUserEmail).get().then(allUsers => {
-            allUsers.forEach(user => {
-              const id = user.id;
-              firestore.collection('users').doc(id).update({ matches: { email: matchingEmail } });
-            })
-          })
         } else {
           return Promise.reject();
         }
       })
-
-
   }
+
+  handleMatch = () => {
+    this.setState({ showMatch: false });
+    const coordinates = this.state.possibleMatch.coordinates;
+    const matchingEmail = this.state.possibleMatch.matchingEmail;
+    console.log(matchingEmail);
+    const currUserEmail = firebase.auth().currentUser.email;
+    this.setState({ matchedMarker: coordinates });
+    firestore.collection('users').where('email', '==', matchingEmail).get().then(allUsers => {
+      allUsers.forEach(user => {
+        const id = user.id;
+        //Updates your data with matched user email
+        firestore.collection('users').doc(id).update({ matches: { email: currUserEmail, location: coordinates } })
+      })
+    })
+    firestore.collection('users').where('email', '==', currUserEmail).get().then(allUsers => {
+      allUsers.forEach(user => {
+        const id = user.id;
+        firestore.collection('users').doc(id).update({ matches: { email: matchingEmail } });
+      })
+    })
+  }
+
 
 
   handleGive = () => {
     console.log("Giving");
+    //This query updates the parkingSpots table with the user coordinates
     firestore.collection('parkingSpots')
       .add({
         Coordinates: this.state.location.coords,
@@ -160,7 +170,6 @@ export default class Map extends Component {
 
         <MapView style={styles.map}
           showsUserLocation={true}
-
           followsUserLocation={true}
           onRegionChangeComplete={this.onRegionChangeComplete}>
         {marker.latitude ?  <Marker
@@ -177,6 +186,15 @@ export default class Map extends Component {
             {this.state.location.longitude}
           </Text>
         }
+        {this.state.showMatch ?  Alert.alert(
+          'Parking Spot Found!',
+          'Navigate there?',
+          [
+            {text: 'Lets Go!', onPress: () => this.handleMatch(), style: 'cancel'},
+            {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'}
+          ],
+          { cancelable: false }
+        ) : null}
         {this.state.showGive ? <Button
           title="Give up Parking!"
           onPress={this.handleGive}>

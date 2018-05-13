@@ -24,10 +24,9 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         padding: 2,
     },
-    tittle: {
+    title: {
         width: 500,
         backgroundColor: '#aabbff',
-        fontFamily: 'Cochin',
         fontWeight: 'bold',
         fontSize: 31,
         textAlign: 'center',
@@ -42,7 +41,7 @@ const styles = StyleSheet.create({
 
 const Welcome = ({ navigation }) => (
     <View style={styles.container}>
-        <Text style={styles.tittle}>Welcome to Parkupied!</Text>
+        <Text style={styles.title}>Welcome to Parkupied!</Text>
         <Image style={styles.logo}
             source={require('../logo.jpg')}
         />
