@@ -217,6 +217,7 @@ export default class Map extends Component {
             {this.state.location.longitude}
           </Text>
         }
+
         {showMatch ? Alert.alert(
           `Parking Spot Found ${possibleMatch.duration} minutes away!`,
           'Navigate there?',
