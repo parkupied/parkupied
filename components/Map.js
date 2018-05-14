@@ -8,6 +8,7 @@ import firestore from '../firestore';
 import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { firebase } from '@firebase/app';
 const key = 'AIzaSyDVmcW1my0uG8kBPgSHWvRhZozepAXqL_A';
+import getDirections from 'react-native-google-maps-directions'
 
 export default class Map extends Component {
 
@@ -21,7 +22,7 @@ export default class Map extends Component {
     showGive: true,
     showLook: true,
     showMatch: false,
-    possibleMatch: {}
+    possibleMatch: {},
   }
 
   componentDidMount() {
@@ -51,6 +52,7 @@ export default class Map extends Component {
     this.setState({ showLook: false, showGive: false });
     console.log("Looking");
     let origin = `${this.state.location.coords.latitude}, ${this.state.location.coords.longitude}`;
+    console.log("ORIGIN", origin);
     let destination = this.state.parkingSpots;
 
 
@@ -68,11 +70,17 @@ export default class Map extends Component {
 
           let fastest = json.rows[0].elements[0];
           let index = 0;
+          let duration = 0;
           //Instead of looking through the rows[0], make an object with key
           //being the address and value being time.
           const optimalRoute = json.rows[0].elements.map((nav, idx) => {
             if (nav.duration.value < fastest.duration.value) {
               fastest = nav; //the actual match
+              //The next two lines are taking the duration of the fastest route
+              //which is in seconds, and converting it to minutes
+              //rounded to the nearest tenth
+              duration = fastest.duration.value / 60;
+              duration = Math.round(duration * 10) / 10
               index = idx
             }
           })
@@ -81,7 +89,7 @@ export default class Map extends Component {
           const perfectCoords = availableSpots[index].split(',');
           const finalMatch = { latitude: +perfectCoords[0], longitude: +perfectCoords[1] };
           const matchingEmail = this.state.emails[index];
-          this.setState({ showMatch: true, possibleMatch: { coordinates: finalMatch, matchingEmail } });
+          this.setState({ showMatch: true, possibleMatch: { coordinates: finalMatch, matchingEmail, duration } });
           // Finds the users who's parking spot we've matched with
         } else {
           return Promise.reject();
@@ -110,6 +118,10 @@ export default class Map extends Component {
     })
   }
 
+  handleCancel = () => {
+    this.setState({ showMatch: false, showLook: true, showGive: true, possibleMatch: {} })
+  }
+
 
 
   handleGive = () => {
@@ -130,8 +142,8 @@ export default class Map extends Component {
               allusers.forEach(user => {
                 let lat = user.matches.location.latitude;
                 let long = user.matches.location.longitude;
-                let coords = {latitude: lat, longitude: long};
-                this.setState({ matchedMarker: coords})
+                let coords = { latitude: lat, longitude: long };
+                this.setState({ matchedMarker: coords })
                 //Display something to the user. "Match Found!""
               })
             })
@@ -162,8 +174,27 @@ export default class Map extends Component {
     // Tell Firestore to update ??
   }
 
+  handleGetDirections = () => {
+    const data = {
+      destination: this.state.matchedMarker,
+      params: [
+        {
+          key: "travelmode",
+          value: "driving"
+        },
+        {
+          key: "dir_action",
+          value: "navigate"       // this instantly initializes navigation using the given travel mode
+        }
+      ]
+    }
+
+    getDirections(data)
+  }
+
+
   render() {
-    const { location, marker, matchedMarker } = this.state;
+    const { location, marker, matchedMarker, possibleMatch, showMatch } = this.state;
     return (
       <View style={styles.container}>
 
@@ -171,12 +202,12 @@ export default class Map extends Component {
           showsUserLocation={true}
           followsUserLocation={true}
           onRegionChangeComplete={this.onRegionChangeComplete}>
-        {marker.latitude ?  <Marker
-          coordinate={marker}
-        /> : null }
-        {matchedMarker.latitude ?  <Marker
-          coordinate={matchedMarker}
-        /> : null }
+          {marker.latitude ? <Marker
+            coordinate={marker}
+          /> : null}
+          {matchedMarker.latitude ? <Marker
+            coordinate={matchedMarker}
+          /> : null}
 
         </MapView>
         {
@@ -185,26 +216,29 @@ export default class Map extends Component {
             {this.state.location.longitude}
           </Text>
         }
-        {this.state.showMatch ?  Alert.alert(
-          'Parking Spot Found!',
-          'See Route',
+
+        {showMatch ? Alert.alert(
+          `Parking Spot Found ${possibleMatch.duration} minutes away!`,
+          'Navigate there?',
           [
-            {text: 'Accept Match', onPress: () => this.handleMatch(), style: 'cancel'},
-            {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'}
+            { text: 'Lets Go!', onPress: () => this.handleMatch(), style: 'cancel' },
+            { text: 'Cancel', onPress: () => this.handleCancel(), style: 'cancel' }
           ],
           { cancelable: false }
         ) : null}
+        {!this.state.showLook ? <Button
+          onPress={this.handleGetDirections} title="Get Directions" />
+          : null}
         {this.state.showGive ? <Button
           title="Give up Parking!"
           onPress={this.handleGive}>
           Give up Parking!
         </Button> : null}
-        {this.state.showLook ?  <Button
+        {this.state.showLook ? <Button
           title="Look For Parking!"
           onPress={this.handleLook}>
           Look for Parking!
         </Button> : null}
-
       </View>
     );
   }
