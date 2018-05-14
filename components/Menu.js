@@ -24,7 +24,7 @@ export default class Menu extends Component {
           <View style={drawerStyles.button}>
             <Button
               buttonStyle={drawerStyles.drawerButtonStyle}
-              onPress={() => { }}
+              onPress={() => {this.props.navigation.navigate('Profile')}}
               title="Profile" />
             <Button
               buttonStyle={drawerStyles.drawerButtonStyle}
