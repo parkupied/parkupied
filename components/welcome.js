@@ -6,31 +6,41 @@ const styles = StyleSheet.create({
     container: {
         padding: 50,
         flex: 1,
+        backgroundColor: '#969694',
         justifyContent: 'space-evenly',
         alignItems: 'center',
     },
     containerRow: {
         flex: 1,
-        backgroundColor: '#aabbff',
+        backgroundColor: '#969694',
         width: 400,
         flexDirection: 'row',
         justifyContent: 'space-evenly',
         alignItems: 'center',
     },
+    button: {
+        width: 400,
+        borderColor: "white",
+        color: "black",
+        borderWidth: 1,
+        borderRadius: 5,
+        padding: 2,
+    },
     signUp: {
         width: 150,
         borderColor: "white",
+        color: "white",
         borderWidth: 1,
         borderRadius: 5,
         padding: 2,
     },
     title: {
-        width: 500,
-        backgroundColor: '#aabbff',
+        fontSize: 75,
         fontWeight: 'bold',
-        fontSize: 31,
+        width: 500,
+        backgroundColor: '#969694',
         textAlign: 'center',
-        color: '#2B60DE'
+        color: 'white'
     },
     logo: {
         width: 400,
@@ -41,13 +51,13 @@ const styles = StyleSheet.create({
 
 const Welcome = ({ navigation }) => (
     <View style={styles.container}>
-        <Text style={styles.title}>Welcome to Parkupied!</Text>
+        <Text style={styles.title}>ParkuPied</Text>
         <Image style={styles.logo}
-            source={require('../logo.jpg')}
+            source={require('../logo.png')}
         />
         <View style={styles.containerRow}>
-            <Button style={styles.signUp} title="Sign Up!" onPress={() => navigation.navigate('Signup')} />
-            <Button style={styles.signUp} title="Login!" onPress={() => navigation.navigate('Login')} />
+            <Button style={styles.button} title="Sign Up" onPress={() => navigation.navigate('Signup')} />
+            <Button style={styles.button} title="Login" onPress={() => navigation.navigate('Login')} />
         </View>
     </View>
 )

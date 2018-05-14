@@ -188,9 +188,9 @@ export default class Map extends Component {
         }
         {this.state.showMatch ?  Alert.alert(
           'Parking Spot Found!',
-          'Navigate there?',
+          'See Route',
           [
-            {text: 'Lets Go!', onPress: () => this.handleMatch(), style: 'cancel'},
+            {text: 'Accept Match', onPress: () => this.handleMatch(), style: 'cancel'},
             {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'}
           ],
           { cancelable: false }
