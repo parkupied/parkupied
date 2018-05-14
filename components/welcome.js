@@ -21,7 +21,6 @@ const styles = StyleSheet.create({
     button: {
         width: 400,
         borderColor: "white",
-        color: "black",
         borderWidth: 1,
         borderRadius: 5,
         padding: 2,
@@ -29,7 +28,6 @@ const styles = StyleSheet.create({
     signUp: {
         width: 150,
         borderColor: "white",
-        color: "white",
         borderWidth: 1,
         borderRadius: 5,
         padding: 2,
@@ -40,7 +38,6 @@ const styles = StyleSheet.create({
         width: 500,
         backgroundColor: '#969694',
         textAlign: 'center',
-        color: 'white'
     },
     logo: {
         width: 400,

@@ -3,14 +3,12 @@ import { StyleSheet, View, Button } from 'react-native';
 import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements';
 import firebase from 'firebase';
 
-
 export default class Login extends Component {
 
 	state = {
 		email: '',
 		password: '',
 	};
-
 
 	handleSubmit = () => {
 		const email = this.state.email;

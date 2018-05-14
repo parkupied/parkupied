@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, Dimensions, View, Platform } from 'react-native';
 import { Button } from 'react-native-elements';
-
 import Drawer from 'react-native-drawer';
 import Map from './Map';
 import { firebase } from '@firebase/app';

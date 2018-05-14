@@ -169,11 +169,6 @@ export default class Map extends Component {
     this.setState({ location });
   };
 
-  onRegionChangeComplete(location) {
-    // console.log("onRegionChangeComplete: ", location);
-    // Tell Firestore to update ??
-  }
-
   handleGetDirections = () => {
     const data = {
       destination: this.state.matchedMarker,
