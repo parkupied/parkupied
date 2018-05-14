@@ -56,7 +56,7 @@ export default class Menu extends Component {
         ref={(ref) => this._drawer = ref}
         style={drawerStyles.drawer}
       >
-        <Map />
+        <Map navigation={this.props.navigation} />
 
         <View style={drawerStyles.callDrawerContainer}>
           <Button
