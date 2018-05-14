@@ -11,10 +11,11 @@ async function signup (name, phone, email, password, carMake, carModel, carColor
     //It might be cool to validate phone number and license with regex, but whatever
 
     // Auth Signup
+    let res = null;
     await firebase.auth().createUserWithEmailAndPassword(email, password).catch(err => {
-        console.error(err).bind(console);
-        return `It seems there was an error: ${err}`; // I don't know when this could hit..
+        res = `It seems there was an error: ${err}`;
     });
+    if (res) return res;
 
     // DB Signup
     await firestore.collection("users").add({
@@ -42,17 +43,19 @@ async function signup (name, phone, email, password, carMake, carModel, carColor
 async function login (email, password) {
     email = email.toLowerCase();
     let exists = false;
+    let res = null;
     await firestore.collection("users").where("email", "==", email).get()
         .then(allUsers => {
             allUsers.forEach(user => {
+                if (user.data().password !== password) {
+                    res = "That's not the right password, sir.";
+                }
                 exists = true;
             })
         });
+    if (res) return res;
     if (exists) {
-        firebase.auth().signInWithEmailAndPassword(email, password).catch(err => {
-            console.error(err).bind(console);
-            return "It would seem that you have the wrong password."; //Hopefully
-        });
+        firebase.auth().signInWithEmailAndPassword(email, password)
         return true; // This is the successful login case
     } else {
         return "That is not a registered user. Try a different email or signing up.";

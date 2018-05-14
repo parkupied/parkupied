@@ -1,25 +1,26 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Button } from 'react-native';
+import { StyleSheet, View, Button, Text } from 'react-native';
 import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements';
 import firebase from 'firebase';
+import { login } from '../fireMethods';
 
 export default class Login extends Component {
 
 	state = {
 		email: '',
 		password: '',
+		response: ''
 	};
 
-	handleSubmit = () => {
+	handleSubmit = async () => {
 		const email = this.state.email;
 		const password = this.state.password;
-		firebase.auth().signInWithEmailAndPassword(email, password)
-			.then(() => {
-				this.props.navigation.navigate('Menu');
-			})
-			.catch(error => {
-				console.log(error);
-			})
+		const result = await login(email, password);
+		if (result === true) {
+			this.props.navigation.navigate('Menu');
+		} else {
+			this.setState({response: result})
+		}
 	}
 
 	render() {
@@ -37,6 +38,7 @@ export default class Login extends Component {
 					onChangeText={password => this.setState({ password })}
 				/>
 				<View style={styles.buttons}>
+				<Text>{this.state.response}</Text>
 					<Button
 						title="Login"
 						onPress={this.handleSubmit}
