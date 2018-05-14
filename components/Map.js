@@ -93,7 +93,6 @@ export default class Map extends Component {
     this.setState({ showMatch: false });
     const coordinates = this.state.possibleMatch.coordinates;
     const matchingEmail = this.state.possibleMatch.matchingEmail;
-    console.log(matchingEmail);
     const currUserEmail = firebase.auth().currentUser.email;
     this.setState({ matchedMarker: coordinates });
     firestore.collection('users').where('email', '==', matchingEmail).get().then(allUsers => {
