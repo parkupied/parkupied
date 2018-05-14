@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { StyleSheet, ScrollView, View, Button } from 'react-native';
+import { StyleSheet, ScrollView, View, Button, Text } from 'react-native';
 import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements';
+import { signup } from '../fireMethods';
 import firestore from '../firestore';
 import firebase from 'firebase';
 
@@ -14,6 +15,7 @@ export default class Signup extends Component {
 		carModel: '',
 		carColor: '',
 		license: '',
+		response: '',
 	};
 
 	handleSubmit = async () => {
@@ -26,30 +28,13 @@ export default class Signup extends Component {
 		const carColor = this.state.carColor;
 		const license = this.state.license;
 
+		const result = await signup(name, phone, email, password, carMake, carModel, carColor, license);
 
-		await firebase.auth().createUserWithEmailAndPassword(email, password).catch(error => {
-			console.log(error);
-		});
-
-		await firestore.collection('users').add({
-			name,
-			phone,
-			email,
-			password,
-			car: {
-				carMake,
-				carModel,
-				carColor,
-				license,
-			},
-			tokens: 0,
-			rating: 0,
-			stikes: 0,
-			location: [],
-			matches: {},
-			pastMatches: []
-		});
-		await this.props.navigation.navigate('Menu');
+		if (typeof result === 'string') {
+			this.setState({ response: result });
+		} else {
+			this.props.navigation.navigate('Menu');
+		}
 	}
 
 
@@ -91,6 +76,7 @@ export default class Signup extends Component {
 				<FormInput placeholder="Please enter your license #"
 					onChangeText={license => this.setState({ license })}
 				/>
+				<Text>{this.state.response}</Text>
 				<View style={styles.buttons}>
 					<Button
 						title="Signup"
