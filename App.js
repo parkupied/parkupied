@@ -4,6 +4,7 @@ import Signup from './components/Signup';
 import Login from './components/Login';
 import Welcome from './components/Welcome';
 import Menu from './components/Menu';
+import Profile from './components/Profile';
 
 
 export default createStackNavigator({
@@ -11,7 +12,8 @@ export default createStackNavigator({
 	Login: { screen: Login },
 	Signup: { screen: Signup },
 	Map: { screen: Map },
-	Menu: { screen: Menu }
+	Menu: { screen: Menu },
+	Profile: {screen: Profile}
 }, {
 		initialRouteName: 'Welcome',
 		navigationOptions: {
