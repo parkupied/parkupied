@@ -9,6 +9,9 @@ import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { firebase } from '@firebase/app';
 const key = 'AIzaSyDVmcW1my0uG8kBPgSHWvRhZozepAXqL_A';
 import getDirections from 'react-native-google-maps-directions'
+import MapViewDirections from 'react-native-maps-directions';
+
+
 
 export default class Map extends Component {
 
@@ -23,6 +26,7 @@ export default class Map extends Component {
     showLook: true,
     showMatch: false,
     possibleMatch: {},
+    showDirections: false
   }
 
   componentDidMount() {
@@ -38,7 +42,6 @@ export default class Map extends Component {
         emails.push(email)
       })
       destinations = destinations.join('|');
-
       const currentSpots = this.state.parkingSpots;
       if (currentSpots.length) {
         this.setState({ parkingSpots: `${currentSpots}|${destinations}` })
@@ -52,7 +55,6 @@ export default class Map extends Component {
     this.setState({ showLook: false, showGive: false });
     console.log("Looking");
     let origin = `${this.state.location.coords.latitude}, ${this.state.location.coords.longitude}`;
-    console.log("ORIGIN", origin);
     let destination = this.state.parkingSpots;
 
 
@@ -74,7 +76,7 @@ export default class Map extends Component {
           //Instead of looking through the rows[0], make an object with key
           //being the address and value being time.
           const optimalRoute = json.rows[0].elements.map((nav, idx) => {
-            if (nav.duration.value < fastest.duration.value) {
+            if (nav.duration.value <= fastest.duration.value) {
               fastest = nav; //the actual match
               //The next two lines are taking the duration of the fastest route
               //which is in seconds, and converting it to minutes
@@ -102,7 +104,7 @@ export default class Map extends Component {
     const coordinates = this.state.possibleMatch.coordinates;
     const matchingEmail = this.state.possibleMatch.matchingEmail;
     const currUserEmail = firebase.auth().currentUser.email;
-    this.setState({ matchedMarker: coordinates });
+    this.setState({ matchedMarker: coordinates, showDirections: true });
     firestore.collection('users').where('email', '==', matchingEmail).get().then(allUsers => {
       allUsers.forEach(user => {
         const id = user.id;
@@ -189,7 +191,7 @@ export default class Map extends Component {
 
 
   render() {
-    const { location, marker, matchedMarker, possibleMatch, showMatch } = this.state;
+    const { location, marker, matchedMarker, possibleMatch, showMatch, showDirections, showGive, showLook } = this.state;
     return (
       <View style={styles.container}>
 
@@ -206,9 +208,9 @@ export default class Map extends Component {
 
         </MapView>
         {
-          this.state.location &&
-          <Text>{this.state.location.latitude}
-            {this.state.location.longitude}
+          location &&
+          <Text>{location.latitude}
+            {location.longitude}
           </Text>
         }
 
@@ -221,15 +223,15 @@ export default class Map extends Component {
           ],
           { cancelable: false }
         ) : null}
-        {!this.state.showLook ? <Button
+        {showDirections ? <Button
           onPress={this.handleGetDirections} title="Get Directions" />
           : null}
-        {this.state.showGive ? <Button
+        {showGive ? <Button
           title="Give up Parking!"
           onPress={this.handleGive}>
           Give up Parking!
         </Button> : null}
-        {this.state.showLook ? <Button
+        {showLook ? <Button
           title="Look For Parking!"
           onPress={this.handleLook}>
           Look for Parking!
@@ -271,5 +273,3 @@ const styles = StyleSheet.create({
     backgroundColor: '#aabbff',
   }
 });
-
-

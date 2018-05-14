@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
         width: 500,
         backgroundColor: '#969694',
         textAlign: 'center',
+        color: 'white'
     },
     logo: {
         width: 400,
