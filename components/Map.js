@@ -53,23 +53,10 @@ export default class Map extends Component {
         this.setState({ parkingSpots: destinations, emails });
       }
     })
-
-    // firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot( matches => {
-    //   matches.docChanges.forEach(match => {
-    //     // snap.forEach(user => {
-
-    //     console.log("match", match.doc.data().matches.location)
-    //     if (match.type === "added") {
-    //       console.log("change", match.doc.data().matches.location);
-    //       this.setState({ matchedMarker: match.doc.data().matches.location});
-    //     };
-    //   })
-    // })
   }
 
   handleLook = () => {
     this.setState({ showLook: false, showGive: false });
-    console.log("Looking");
     let origin = `${this.state.location.coords.latitude}, ${this.state.location.coords.longitude}`;
     let destination = this.state.parkingSpots;
 
@@ -109,7 +96,6 @@ export default class Map extends Component {
           const perfectCoords = availableSpots[index].split(',');
           const finalMatch = { latitude: +perfectCoords[0], longitude: +perfectCoords[1] };
           const matchingEmail = this.state.emails[index];
-          console.log("Matching Email in Handle Loook: ", matchingEmail);
           this.setState({ showMatch: true, possibleMatch: { coordinates: finalMatch, matchingEmail, duration } });
           // Finds the users who's parking spot we've matched with
         } else {
@@ -121,10 +107,8 @@ export default class Map extends Component {
   handleMatch = () => {
     const coordinates = this.state.possibleMatch.coordinates;
     const matchingEmail = this.state.possibleMatch.matchingEmail;
-    console.log("STATE:: ", this.state);
     const currUserEmail = firebase.auth().currentUser.email;
-    this.setState({ showMatch: false, modalEmail: matchingEmail });
-    this.setState({ matchedMarker: coordinates, showDirections: true });
+    this.setState({ showMatch: false, modalEmail: matchingEmail, matchedMarker: coordinates, showDirections: true });
     firestore.collection('users').where('email', '==', matchingEmail).get().then(allUsers => {
       allUsers.forEach(user => {
         const id = user.id;
@@ -147,7 +131,6 @@ export default class Map extends Component {
 
 
   handleGive = () => {
-    console.log("Giving");
     //This query updates the parkingSpots table with the user coordinates
     firestore.collection('parkingSpots')
       .add({
@@ -158,9 +141,7 @@ export default class Map extends Component {
       firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot( matches => {
         matches.docChanges.forEach(match => {
           // snap.forEach(user => {
-            console.log(">>>>>>", match.doc.data());
           if (match.doc.data() && match.doc.data().matches && match.doc.data().matches.location) this.setState({ matchedMarker: match.doc.data().matches.location, modalEmail: match.doc.data().matches.email })
-          console.log("match", match.doc.data().matches.location);
 
         })
       })
@@ -200,7 +181,6 @@ export default class Map extends Component {
   }
 
   onRegionChangeComplete = async (location) => {
-    console.log('onRegionChangeComplete', location);
     let origin = `${location.latitude}, ${location.longitude}`;
     this.setState({ movinglocation: origin });
 
@@ -210,7 +190,6 @@ export default class Map extends Component {
       allUsers.forEach(user => {
         const id = user.id;
         //Updates your data with matched user email
-        console.log(">>>>>>", user.data().matches);
         if (user.data().matches.email) matchingEmail = user.data().matches.email;
         myLocation = user.data().location;
         firestore.collection('users').doc(id).update({ location: this.state.movinglocation })
