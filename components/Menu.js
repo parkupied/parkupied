@@ -3,9 +3,22 @@ import { StyleSheet, Text, Dimensions, View, Platform } from 'react-native';
 import { Button } from 'react-native-elements';
 import Drawer from 'react-native-drawer';
 import Map from './Map';
+import firestore from '../firestore';
 import { firebase } from '@firebase/app';
 
 export default class Menu extends Component {
+  state = {
+    tokens : null
+  }
+
+  componentDidMount() {
+    firestore.collection('users').where('email', '==', firebase.auth().currentUser.email).get().then(allUsers => {
+      allUsers.forEach(user => {
+        this.setState({ tokens: user.data().tokens })
+      })
+    })
+
+  }
 
   closeControlPanel = () => {
     this._drawer.close();
@@ -22,6 +35,7 @@ export default class Menu extends Component {
         tapToClose={true}
         content={
           <View style={drawerStyles.button}>
+            <Text>Carma Points: {this.state.tokens}</Text>
             <Button
               buttonStyle={drawerStyles.drawerButtonStyle}
               onPress={() => { }}

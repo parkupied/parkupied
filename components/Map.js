@@ -37,7 +37,7 @@ export default class Map extends Component {
       allSpots.docChanges.forEach(spot => {
         const spotObj = spot.doc.data().Coordinates;
         const email = spot.doc.data().email;
-        let newDestination = `${spotObj.latitude},${spotObj.longitude}`;
+        let newDestination = `${spotObj.latitude},${spotObj.longitude}`; //Leave this as spot obj
         destinations.push(newDestination);
         emails.push(email)
       })
@@ -45,6 +45,7 @@ export default class Map extends Component {
       const currentSpots = this.state.parkingSpots;
       if (currentSpots.length) {
         this.setState({ parkingSpots: `${currentSpots}|${destinations}` })
+        //EMAIL?!?! Keep State as an array
       } else {
         this.setState({ parkingSpots: destinations, emails });
       }
@@ -65,7 +66,7 @@ export default class Map extends Component {
       .then(json => {
         if (json.status !== 'OK') {
           const errorMessage = json.error_message || 'Unknown error';
-          return Promise.reject(errorMessage);
+          throw errorMessage;
         }
 
         if (json.rows.length) {
@@ -83,11 +84,13 @@ export default class Map extends Component {
               //rounded to the nearest tenth
               duration = fastest.duration.value / 60;
               duration = Math.round(duration * 10) / 10
+              //Calculation in the front end
               index = idx
             }
           })
 
           const availableSpots = destination.split('|');
+          //^Unnecessary if in an array
           const perfectCoords = availableSpots[index].split(',');
           const finalMatch = { latitude: +perfectCoords[0], longitude: +perfectCoords[1] };
           const matchingEmail = this.state.emails[index];
@@ -136,7 +139,7 @@ export default class Map extends Component {
       });
 
     // Firestore should listen for a snapshot (change) in your match property
-    var unsubscribe = firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot(snap => {
+    let unsubscribe = firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot(snap => {
       snap.docChanges.forEach(user => {
         if (user.doc.data().matches !== {}) {
           firestore.collection("users").where("email", "==", user.matches.email).get()

@@ -31,6 +31,8 @@ export default class Signup extends Component {
 			console.log(error);
 		});
 
+		//Try - Catch
+
 		await firestore.collection('users').add({
 			name,
 			phone,
