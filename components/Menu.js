@@ -38,7 +38,7 @@ export default class Menu extends Component {
             <Text>Carma Points: {this.state.tokens}</Text>
             <Button
               buttonStyle={drawerStyles.drawerButtonStyle}
-              onPress={() => { }}
+              onPress={() => {this.props.navigation.navigate('Profile')}}
               title="Profile" />
             <Button
               buttonStyle={drawerStyles.drawerButtonStyle}
