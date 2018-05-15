@@ -16,6 +16,7 @@ import MapViewDirections from 'react-native-maps-directions';
 export default class Map extends Component {
 
   state = {
+    movinglocation: null,
     location: null,
     errorMessage: null,
     marker: { latitude: null, longitude: null },
@@ -49,6 +50,18 @@ export default class Map extends Component {
         this.setState({ parkingSpots: destinations, emails });
       }
     })
+
+    // firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot( matches => {
+    //   matches.docChanges.forEach(match => {
+    //     // snap.forEach(user => {
+
+    //     console.log("match", match.doc.data().matches.location)
+    //     if (match.type === "added") {
+    //       console.log("change", match.doc.data().matches.location);
+    //       this.setState({ matchedMarker: match.doc.data().matches.location});
+    //     };
+    //   })
+    // })
   }
 
   handleLook = () => {
@@ -109,7 +122,7 @@ export default class Map extends Component {
       allUsers.forEach(user => {
         const id = user.id;
         //Updates your data with matched user email
-        firestore.collection('users').doc(id).update({ matches: { email: currUserEmail, location: coordinates } })
+        firestore.collection('users').doc(id).update({ matches: { email: currUserEmail, location: 'coordinates' } })
       })
     })
     firestore.collection('users').where('email', '==', currUserEmail).get().then(allUsers => {
@@ -135,26 +148,16 @@ export default class Map extends Component {
         email: firebase.auth().currentUser.email,
       });
 
-    // Firestore should listen for a snapshot (change) in your match property
-    var unsubscribe = firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot(snap => {
-      snap.docChanges.forEach(user => {
-        if (user.doc.data().matches !== {}) {
-          firestore.collection("users").where("email", "==", user.matches.email).get()
-            .then(allusers => { // this should really only be one user.
-              allusers.forEach(user => {
-                let lat = user.matches.location.latitude;
-                let long = user.matches.location.longitude;
-                let coords = { latitude: lat, longitude: long };
-                this.setState({ matchedMarker: coords })
-                //Display something to the user. "Match Found!""
-              })
-            })
-        };
+      firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot( matches => {
+        matches.docChanges.forEach(match => {
+          // snap.forEach(user => {
+
+          if (match.doc.data().matches.location) this.setState({ matchedMarker: match.doc.data().matches.location })
+          console.log("match", match.doc.data().matches.location);
+
+        })
       })
-    })
-    // And then do whatever
-    // And then stop listening
-    unsubscribe();
+
     this.setState({ showGive: false, showLook: false })
   }
 
@@ -189,6 +192,32 @@ export default class Map extends Component {
     getDirections(data)
   }
 
+  onRegionChangeComplete = async (location) => {
+    console.log('onRegionChangeComplete', location);
+    let origin = `${location.latitude}, ${location.longitude}`;
+    this.setState({ movinglocation: origin });
+
+    let matchingEmail = '';
+    await firestore.collection('users').where('email', '==', firebase.auth().currentUser.email).get().then(allUsers => {
+      allUsers.forEach(user => {
+        const id = user.id;
+        //Updates your data with matched user email
+        console.log(">>>>>>", user.data().matches);
+        if (user.data().matches.email) matchingEmail = user.data().matches.email;
+        firestore.collection('users').doc(id).update({ location: this.state.movinglocation })
+      })
+    })
+    if (matchingEmail) {
+      firestore.collection('users').where('email', '==', matchingEmail).get().then(allUsers => {
+        allUsers.forEach(user => {
+          const id = user.id;
+          //Updates your data with matched user email
+          firestore.collection('users').doc(id).update({ matches: { email: firebase.auth().currentUser.email, location: "this.state.movinglocation" } })
+        })
+      })
+    }
+  }
+
 
   render() {
     const { location, marker, matchedMarker, possibleMatch, showMatch, showDirections, showGive, showLook } = this.state;
@@ -196,12 +225,14 @@ export default class Map extends Component {
       <View style={styles.container}>
 
         <MapView style={styles.map}
+          onRegionChangeComplete={this.onRegionChangeComplete}
           showsUserLocation={true}
           followsUserLocation={true}
           onRegionChangeComplete={this.onRegionChangeComplete}>
           {marker.latitude ? <Marker
             coordinate={marker}
           /> : null}
+
           {matchedMarker.latitude ? <Marker
             coordinate={matchedMarker}
           /> : null}
