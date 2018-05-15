@@ -39,6 +39,8 @@ async function signup (name, phone, email, password, carMake, carModel, carColor
     return true;
 }
 
+
+//More consistent promise syntax
 // Login
 async function login (email, password) {
     email = email.toLowerCase();
