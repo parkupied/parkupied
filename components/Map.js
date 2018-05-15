@@ -10,12 +10,14 @@ import { firebase } from '@firebase/app';
 const key = 'AIzaSyDVmcW1my0uG8kBPgSHWvRhZozepAXqL_A';
 import getDirections from 'react-native-google-maps-directions'
 import MapViewDirections from 'react-native-maps-directions';
+import UserInfo from './UserInfo';
 
 
 
 export default class Map extends Component {
 
   state = {
+    movinglocation: null,
     location: null,
     errorMessage: null,
     marker: { latitude: null, longitude: null },
@@ -26,7 +28,8 @@ export default class Map extends Component {
     showLook: true,
     showMatch: false,
     possibleMatch: {},
-    showDirections: false
+    showDirections: false,
+    modalEmail: '',
   }
 
   componentDidMount() {
@@ -54,7 +57,6 @@ export default class Map extends Component {
 
   handleLook = () => {
     this.setState({ showLook: false, showGive: false });
-    console.log("Looking");
     let origin = `${this.state.location.coords.latitude}, ${this.state.location.coords.longitude}`;
     let destination = this.state.parkingSpots;
 
@@ -103,16 +105,15 @@ export default class Map extends Component {
   }
 
   handleMatch = () => {
-    this.setState({ showMatch: false });
     const coordinates = this.state.possibleMatch.coordinates;
     const matchingEmail = this.state.possibleMatch.matchingEmail;
     const currUserEmail = firebase.auth().currentUser.email;
-    this.setState({ matchedMarker: coordinates, showDirections: true });
+    this.setState({ showMatch: false, modalEmail: matchingEmail, matchedMarker: coordinates, showDirections: true });
     firestore.collection('users').where('email', '==', matchingEmail).get().then(allUsers => {
       allUsers.forEach(user => {
         const id = user.id;
         //Updates your data with matched user email
-        firestore.collection('users').doc(id).update({ matches: { email: currUserEmail, location: coordinates } })
+        firestore.collection('users').doc(id).update({ matches: { email: currUserEmail, location: 'coordinates' } })
       })
     })
     firestore.collection('users').where('email', '==', currUserEmail).get().then(allUsers => {
@@ -130,7 +131,6 @@ export default class Map extends Component {
 
 
   handleGive = () => {
-    console.log("Giving");
     //This query updates the parkingSpots table with the user coordinates
     firestore.collection('parkingSpots')
       .add({
@@ -138,26 +138,14 @@ export default class Map extends Component {
         email: firebase.auth().currentUser.email,
       });
 
-    // Firestore should listen for a snapshot (change) in your match property
-    let unsubscribe = firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot(snap => {
-      snap.docChanges.forEach(user => {
-        if (user.doc.data().matches !== {}) {
-          firestore.collection("users").where("email", "==", user.matches.email).get()
-            .then(allusers => { // this should really only be one user.
-              allusers.forEach(user => {
-                let lat = user.matches.location.latitude;
-                let long = user.matches.location.longitude;
-                let coords = { latitude: lat, longitude: long };
-                this.setState({ matchedMarker: coords })
-                //Display something to the user. "Match Found!""
-              })
-            })
-        };
+      firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot( matches => {
+        matches.docChanges.forEach(match => {
+          // snap.forEach(user => {
+          if (match.doc.data() && match.doc.data().matches && match.doc.data().matches.location) this.setState({ matchedMarker: match.doc.data().matches.location, modalEmail: match.doc.data().matches.email })
+
+        })
       })
-    })
-    // And then do whatever
-    // And then stop listening
-    unsubscribe();
+
     this.setState({ showGive: false, showLook: false })
   }
 
@@ -192,6 +180,32 @@ export default class Map extends Component {
     getDirections(data)
   }
 
+  onRegionChangeComplete = async (location) => {
+    let origin = `${location.latitude}, ${location.longitude}`;
+    this.setState({ movinglocation: origin });
+
+    let matchingEmail = '';
+    let myLocation = '';
+    await firestore.collection('users').where('email', '==', firebase.auth().currentUser.email).get().then(allUsers => {
+      allUsers.forEach(user => {
+        const id = user.id;
+        //Updates your data with matched user email
+        if (user.data().matches.email) matchingEmail = user.data().matches.email;
+        myLocation = user.data().location;
+        firestore.collection('users').doc(id).update({ location: this.state.movinglocation })
+      })
+    })
+    if (matchingEmail) {
+      firestore.collection('users').where('email', '==', matchingEmail).get().then(allUsers => {
+        allUsers.forEach(user => {
+          const id = user.id;
+          //Updates your data with matched user email
+          firestore.collection('users').doc(id).update({ matches: { email: firebase.auth().currentUser.email, location: myLocation } })
+        })
+      })
+    }
+  }
+
 
   render() {
     const { location, marker, matchedMarker, possibleMatch, showMatch, showDirections, showGive, showLook } = this.state;
@@ -199,12 +213,14 @@ export default class Map extends Component {
       <View style={styles.container}>
 
         <MapView style={styles.map}
+          onRegionChangeComplete={this.onRegionChangeComplete}
           showsUserLocation={true}
           followsUserLocation={true}
           onRegionChangeComplete={this.onRegionChangeComplete}>
           {marker.latitude ? <Marker
             coordinate={marker}
           /> : null}
+
           {matchedMarker.latitude ? <Marker
             coordinate={matchedMarker}
           /> : null}
@@ -226,6 +242,9 @@ export default class Map extends Component {
           ],
           { cancelable: false }
         ) : null}
+
+        {this.state.modalEmail && this.state.modalEmail.length && <UserInfo email={this.state.modalEmail} />}
+
         {showDirections ? <Button
           onPress={this.handleGetDirections} title="Get Directions" />
           : null}

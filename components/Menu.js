@@ -11,14 +11,14 @@ export default class Menu extends Component {
     tokens : null
   }
 
-  componentDidMount() {
-    firestore.collection('users').where('email', '==', firebase.auth().currentUser.email).get().then(allUsers => {
-      allUsers.forEach(user => {
-        this.setState({ tokens: user.data().tokens })
-      })
-    })
-
-  }
+  // componentDidMount() {
+  //   firestore.collection('users').where('email', '==', firebase.auth().currentUser.email).get().then(allUsers => {
+  //     allUsers.forEach(user => {
+  //       this.setState({ tokens: user.data().tokens })
+  //     })
+  //   })
+  //   console.log(firebase.auth().currentUser.email);
+  // }
 
   closeControlPanel = () => {
     this._drawer.close();
@@ -38,6 +38,7 @@ export default class Menu extends Component {
             <Text>Carma Points: {this.state.tokens}</Text>
             <Button
               buttonStyle={drawerStyles.drawerButtonStyle}
+              titleStyle={{ fontWeight: "700", position: "absolute" }}
               onPress={() => {this.props.navigation.navigate('Profile')}}
               title="Profile" />
             <Button
@@ -87,7 +88,7 @@ const drawerStyles = {
   drawer: {
     backgroundColor: '#000000',
     shadowOpacity: 0.5,
-    shadowRadius: 10,
+    shadowRadius: 10
   },
 
   button: {
@@ -104,7 +105,7 @@ const drawerStyles = {
 
   drawerButtonStyle: {
     backgroundColor: "#C0C0C0",
-    width: 150,
+    width: 200,
     height: 45,
     borderColor: "white",
     borderWidth: 1,
