@@ -141,12 +141,10 @@ export default class Map extends Component {
       firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot( matches => {
         matches.docChanges.forEach(match => {
           // snap.forEach(user => {
-            console.log("COORDS", match.doc.data().matches.location);
           if (match.doc.data() && match.doc.data().matches && match.doc.data().matches.location) {
             const perfectCoords = match.doc.data().matches.location.split(',');
             const finalMatch = { latitude: +perfectCoords[0], longitude: +perfectCoords[1] };
             this.setState({ matchedMarker: finalMatch, modalEmail: match.doc.data().matches.email })
-            console.log(firebase.auth().currentUser.email, this.state.matchedMarker)
           }
         })
       })
