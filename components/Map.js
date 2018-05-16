@@ -107,7 +107,6 @@ export default class Map extends Component {
   handleMatch = async () => {
     const coordinates = this.state.possibleMatch.coordinates;
     const matchingEmail = await this.state.possibleMatch.matchingEmail;
-    console.log("Possible match: ", matchingEmail);
     const currUserEmail = firebase.auth().currentUser.email;
     this.setState({ showMatch: false, modalEmail: matchingEmail, matchedMarker: coordinates, showDirections: true });
     firestore.collection('users').where('email', '==', matchingEmail).get().then(allUsers => {
@@ -167,6 +166,7 @@ export default class Map extends Component {
   };
 
   handleFinalizeTransaction = async () => {
+    this.setState({ matchedMarker: { latitude: null, longitude: null }, showGive: true, showLook: true, showDirections: false });
     // Find the ParkingSpot
     // If this.stat.showDirections is true, then the current logged in user is not the email on parkingSpot
     const currEmail = firebase.auth().currentUser.email
@@ -205,7 +205,6 @@ export default class Map extends Component {
       let firstId; let secondId; let firstPoints; let secondPoints;
       if (spotId) {
         await firestore.collection("parkingSpots").doc(spotId).delete();
-        this.setState({ matchedMarker: { latitude: null, longitude: null }, modalEmail: '', showGive: true, showLook: true, showDirections: false });
       }
 
       await firestore.collection("users").where("email", "==", spotEmail).get().then(users => {
@@ -219,8 +218,8 @@ export default class Map extends Component {
         })
       })
       // Now update
-      await firestore.collection("users").doc(firstId).update({ matches: {} });
-      await firestore.collection("users").doc(secondId).update({ matches: {} });
+      firestore.collection("users").doc(firstId).update({ matches: {} });
+      firestore.collection("users").doc(secondId).update({ matches: {} });
     }
     // Increment the Confirmation Count
     // If Conf Count == 2 then do other stuff // And show changes
