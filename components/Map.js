@@ -104,9 +104,9 @@ export default class Map extends Component {
       })
   }
 
-  handleMatch = () => {
+  handleMatch = async () => {
     const coordinates = this.state.possibleMatch.coordinates;
-    const matchingEmail = this.state.possibleMatch.matchingEmail;
+    const matchingEmail = await this.state.possibleMatch.matchingEmail;
     const currUserEmail = firebase.auth().currentUser.email;
     this.setState({ showMatch: false, modalEmail: matchingEmail, matchedMarker: coordinates, showDirections: true });
     firestore.collection('users').where('email', '==', matchingEmail).get().then(allUsers => {
@@ -136,6 +136,7 @@ export default class Map extends Component {
       .add({
         Coordinates: this.state.location.coords,
         email: firebase.auth().currentUser.email,
+        confirmationCount: 0,
       });
 
       firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot( matches => {
@@ -163,6 +164,66 @@ export default class Map extends Component {
     let location = await Location.getCurrentPositionAsync({});
     this.setState({ location });
   };
+
+  handleFinalizeTransaction = async () => {
+    this.setState({ matchedMarker: { latitude: null, longitude: null }, showGive: true, showLook: true, showDirections: false });
+    // Find the ParkingSpot
+    // If this.stat.showDirections is true, then the current logged in user is not the email on parkingSpot
+    const currEmail = firebase.auth().currentUser.email
+    let spotEmail = this.state.showDirections ? false : currEmail;
+    let secondEmail;
+
+    await firestore.collection("users").where("email", "==", currEmail).get().then(allUsers => {
+      allUsers.forEach(user => {
+        // spotEmail = user.data().matches.email;
+        // secondEmail = currEmail;
+        if (spotEmail === currEmail) {
+          secondEmail = user.data().matches.email;
+        } else {
+          spotEmail = user.data().matches.email;
+          secondEmail = currEmail;
+        }
+      })
+    })
+
+    let spotId = '';
+    await firestore.collection("parkingSpots").where("email", "==", spotEmail).get().then(allSpots => {
+      allSpots.forEach(spot => {
+        spotId = spot.id;
+      })
+    })
+    let confCount = 0;
+    await firestore.collection("parkingSpots").doc(spotId).get().then( spot => {
+        confCount = spot.data().confirmationCount;
+    })
+    if (confCount === 0) {
+      firestore.collection("parkingSpots").doc(spotId).update({
+        confirmationCount: ++confCount
+      })
+    } else {
+      // const secondEmail = (spotEmail === currEmail) ? get match email : currEmail;
+      let firstId; let secondId; let firstPoints; let secondPoints;
+      if (spotId) {
+        await firestore.collection("parkingSpots").doc(spotId).delete();
+      }
+
+      await firestore.collection("users").where("email", "==", spotEmail).get().then(users => {
+        users.forEach(user => {
+          firstId = user.id;
+        })
+      })
+      await firestore.collection("users").where("email", "==", secondEmail).get().then(users => {
+        users.forEach(user => {
+          secondId = user.id;
+        })
+      })
+      // Now update
+      firestore.collection("users").doc(firstId).update({ matches: {} });
+      firestore.collection("users").doc(secondId).update({ matches: {} });
+    }
+    // Increment the Confirmation Count
+    // If Conf Count == 2 then do other stuff // And show changes
+  }
 
   handleGetDirections = () => {
     const data = {
@@ -248,13 +309,16 @@ export default class Map extends Component {
 
         {this.state.modalEmail ? this.state.modalEmail.length ? <UserInfo email={this.state.modalEmail} /> : null : null}
 
+        {this.state.modalEmail ? this.state.modalEmail.length ? <Button 
+          title="Confirm Transaction is Complete" onPress={this.handleFinalizeTransaction} /> : null : null}
+
         {showDirections ? <Button
           onPress={this.handleGetDirections} title="Get Directions" />
           : null}
-          {matchedMarker.latitude ? <Button
+          {/* {matchedMarker.latitude ? <Button
             title="Confirm Transaction"
             onPress={console.log("hi")}
-          /> : null}
+          /> : null} */}
         {showGive ? <Button
           title="Give up Parking!"
           onPress={this.handleGive}/> : null}
