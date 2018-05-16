@@ -41,10 +41,7 @@ export default class Login extends Component {
 				<Text>{this.state.response}</Text>
 					<Button
 						title="Login"
-						onPress={this.handleSubmit}
-					>
-						Login
-					</Button>
+						onPress={this.handleSubmit} />
 				</View>
 			</View>
 		</View>
