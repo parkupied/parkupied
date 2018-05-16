@@ -33,7 +33,7 @@ async function signup (name, phone, email, password, carMake, carModel, carColor
         rating: 0,
         strikes: 0,
         location: [],
-        match: {},
+        matches: {},
         pastMatches: []
     });
     return true;
