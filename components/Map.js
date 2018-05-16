@@ -140,7 +140,6 @@ export default class Map extends Component {
 
       firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot( matches => {
         matches.docChanges.forEach(match => {
-          // snap.forEach(user => {
           if (match.doc.data() && match.doc.data().matches && match.doc.data().matches.location) {
             const perfectCoords = match.doc.data().matches.location.split(',');
             const finalMatch = { latitude: +perfectCoords[0], longitude: +perfectCoords[1] };
