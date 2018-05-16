@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Modal, View, Button, Text } from 'react-native';
 import firestore from '../firestore';
+import style from '../public/style';
 
 export default class UserInfo extends Component {
 
@@ -30,12 +31,13 @@ export default class UserInfo extends Component {
                     license: singleUser.data().car.license,
                 })
             })
-        }) 
+        })
     }
 
     render () {
         return (
             <Modal
+                animationType="slide"
                 transparent={true}
                 visible={this.state && this.state.isOpen}
                 onRequestClose={() => {this.setState({ isOpen: false })}}
@@ -48,18 +50,17 @@ export default class UserInfo extends Component {
                 }}>
                     <View style={{
                         width: 300,
-                        height: 300,
-                        backgroundColor: "red"
+                        height: 600,
+                        backgroundColor: 'rgba(255,255,255,0.5)',
                     }}>
-                        <Text>You got a match!!</Text>
-                        <Text>Name: {this.state && this.state.name}</Text>
+                        <Text style={{fontSize: 32, color: 'white', fontWeight: 'bold', textAlign: 'center' }} >You got a match!</Text>
+                        <Text>You've matched with {this.state && this.state.name}</Text>
                         <Text>Phone: {this.state && this.state.phone}</Text>
                         <Text>Car: {this.state && this.state.carMake}</Text>
                         <Text>Color: {this.state && this.state.carColor}</Text>
                         <Text>Model: {this.state && this.state.carModel}</Text>
                         <Text>License: {this.state && this.state.license}</Text>
-                        <Text>This the text in the modal.</Text>
-                        <Button title="Close me!" onPress={() => this.setState({ isOpen: false })} />
+                        <Button style={style.button} title="Close me!" onPress={() => this.setState({ isOpen: false })} />
                     </View>
                 </View>
             </Modal>

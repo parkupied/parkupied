@@ -4,6 +4,7 @@ import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elemen
 import { signup } from '../fireMethods';
 import firestore from '../firestore';
 import firebase from 'firebase';
+import style from '../public/style'
 
 export default class Signup extends Component {
 	state = {
@@ -42,8 +43,8 @@ export default class Signup extends Component {
 
 		return (
 			<View>
-			<Button style={styles.backButton} title='Go Back' onPress={() => this.props.navigation.navigate('Welcome')} />
-			<ScrollView style={styles.buttons}>
+			<Button style={style.backButton} title='Go Back' onPress={() => this.props.navigation.navigate('Welcome')} />
+			<ScrollView style={style.button}>
 				<FormLabel>Full Name</FormLabel>
 				<FormInput placeholder="Please enter your full name"
 					onChangeText={name => this.setState({ name })}
@@ -77,7 +78,7 @@ export default class Signup extends Component {
 					onChangeText={license => this.setState({ license })}
 				/>
 				<Text>{this.state.response}</Text>
-				<View style={styles.buttons}>
+				<View style={style.button}>
 					<Button
 						title="Signup"
 						onPress={this.handleSubmit}
@@ -89,13 +90,5 @@ export default class Signup extends Component {
 	}
 }
 
-const styles = StyleSheet.create({
-	buttons: {
-		margin: 20,
-		marginTop: 50
-	},
-	backButton: {
-		marginTop: 'auto'
-	}
-});
+
 

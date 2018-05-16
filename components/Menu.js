@@ -5,6 +5,8 @@ import Drawer from 'react-native-drawer';
 import Map from './Map';
 import firestore from '../firestore';
 import { firebase } from '@firebase/app';
+import style from '../public/style';
+
 
 export default class Menu extends Component {
   state = {
@@ -34,31 +36,31 @@ export default class Menu extends Component {
         type="overlay"
         tapToClose={true}
         content={
-          <View style={drawerStyles.button}>
+          <View style={style.menuButton}>
             <Text>Carma Points: {this.state.tokens}</Text>
             <Button
-              buttonStyle={drawerStyles.drawerButtonStyle}
+              buttonStyle={style.drawerButtonStyle}
               titleStyle={{ fontWeight: "700", position: "absolute" }}
               onPress={() => {this.props.navigation.navigate('Profile')}}
               title="Profile" />
             <Button
-              buttonStyle={drawerStyles.drawerButtonStyle}
+              buttonStyle={style.drawerButtonStyle}
               onPress={() => { }}
               title="Legal" />
             <Button
-              buttonStyle={drawerStyles.drawerButtonStyle}
+              buttonStyle={style.drawerButtonStyle}
               onPress={() => { }}
               title="Settings" />
             <Button
-              buttonStyle={drawerStyles.drawerButtonStyle}
+              buttonStyle={style.drawerButtonStyle}
               onPress={() => { }}
               title="Contact Us" />
             <Button
-              buttonStyle={drawerStyles.drawerButtonStyle}
+              buttonStyle={style.drawerButtonStyle}
               onPress={() => { }}
               title="Help" />
             <Button
-              buttonStyle={drawerStyles.drawerButtonStyle}
+              buttonStyle={style.drawerButtonStyle}
               onPress={() => { firebase.auth().signOut().then((() => this.props.navigation.navigate('Welcome'))) }}
               title="Logout" />
           </View>
@@ -67,58 +69,18 @@ export default class Menu extends Component {
         panCloseMask={0.2}
         closedDrawerOffset={-3}
         ref={(ref) => this._drawer = ref}
-        style={drawerStyles.drawer}
+        style={style.drawer}
       >
         <Map />
 
-        <View style={drawerStyles.callDrawerContainer}>
+        <View style={style.callDrawerContainer}>
           <Button
-            buttonStyle={drawerStyles.menuButtonStyle}
+            buttonStyle={style.menuButtonStyle}
             title="Menu"
             onPress={this.openControlPanel}
           />
         </View>
       </Drawer>
     )
-  }
-}
-
-const drawerStyles = {
-
-  drawer: {
-    backgroundColor: '#000000',
-    shadowOpacity: 0.5,
-    shadowRadius: 10
-  },
-
-  button: {
-    padding: 1,
-    flex: 1,
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-  },
-
-  callDrawerContainer: {
-    padding: 25
-  },
-
-  drawerButtonStyle: {
-    backgroundColor: "#C0C0C0",
-    width: 200,
-    height: 45,
-    borderColor: "white",
-    borderWidth: 1,
-    borderRadius: 5,
-    padding: 5
-  },
-  menuButtonStyle: {
-    backgroundColor: "rgba(48,48,48,1)",
-    width: 100,
-    height: 45,
-    borderColor: "white",
-    borderWidth: 1,
-    borderRadius: 5,
-    padding: 5
   }
 }

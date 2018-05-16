@@ -3,6 +3,8 @@ import { StyleSheet, View, Button, Text } from 'react-native';
 import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements';
 import firebase from 'firebase';
 import { login } from '../fireMethods';
+import style from '../public/style'
+
 
 export default class Login extends Component {
 
@@ -28,7 +30,7 @@ export default class Login extends Component {
 		return (
 			<View>
 			<Button title='Go Back' onPress={() => this.props.navigation.navigate('Welcome')} />
-			<View style={styles.buttons}>
+			<View style={style.button}>
 				<FormLabel>E-mail</FormLabel>
 				<FormInput placeholder="Please enter your email"
 					onChangeText={email => this.setState({ email })}
@@ -37,7 +39,7 @@ export default class Login extends Component {
 				<FormInput placeholder="Please enter your password"
 					onChangeText={password => this.setState({ password })}
 				/>
-				<View style={styles.buttons}>
+				<View style={style.button}>
 				<Text>{this.state.response}</Text>
 					<Button
 						title="Login"
