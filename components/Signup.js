@@ -3,7 +3,7 @@ import { StyleSheet, ScrollView, View, Button, Text } from 'react-native';
 import { FormLabel, FormInput, FormValidationMessage } from 'react-native-elements';
 import { signup } from '../fireMethods';
 import firestore from '../firestore';
-import { firebase } from 'firebase';
+import firebase from 'firebase';
 
 export default class Signup extends Component {
 	state = {

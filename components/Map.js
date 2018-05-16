@@ -113,7 +113,7 @@ export default class Map extends Component {
       allUsers.forEach(user => {
         const id = user.id;
         //Updates your data with matched user email
-        firestore.collection('users').doc(id).update({ matches: { email: currUserEmail, location: 'coordinates' } })
+        firestore.collection('users').doc(id).update({ matches: { email: currUserEmail, location: this.state.movinglocation } })
       })
     })
     firestore.collection('users').where('email', '==', currUserEmail).get().then(allUsers => {
@@ -140,9 +140,11 @@ export default class Map extends Component {
 
       firestore.collection("users").where("email", "==", firebase.auth().currentUser.email).onSnapshot( matches => {
         matches.docChanges.forEach(match => {
-          // snap.forEach(user => {
-          if (match.doc.data() && match.doc.data().matches && match.doc.data().matches.location) this.setState({ matchedMarker: match.doc.data().matches.location, modalEmail: match.doc.data().matches.email })
-
+          if (match.doc.data() && match.doc.data().matches && match.doc.data().matches.location) {
+            const perfectCoords = match.doc.data().matches.location.split(',');
+            const finalMatch = { latitude: +perfectCoords[0], longitude: +perfectCoords[1] };
+            this.setState({ matchedMarker: finalMatch, modalEmail: match.doc.data().matches.email })
+          }
         })
       })
 
@@ -225,6 +227,7 @@ export default class Map extends Component {
             coordinate={matchedMarker}
           /> : null}
 
+
         </MapView>
         {
           location &&
@@ -243,21 +246,22 @@ export default class Map extends Component {
           { cancelable: false }
         ) : null}
 
-        {this.state.modalEmail && this.state.modalEmail.length && <UserInfo email={this.state.modalEmail} />}
+        {this.state.modalEmail ? this.state.modalEmail.length ? <UserInfo email={this.state.modalEmail} /> : null : null}
 
         {showDirections ? <Button
           onPress={this.handleGetDirections} title="Get Directions" />
           : null}
+          {matchedMarker.latitude ? <Button
+            title="Confirm Transaction"
+            onPress={console.log("hi")}
+          /> : null}
         {showGive ? <Button
           title="Give up Parking!"
-          onPress={this.handleGive}>
-          Give up Parking!
-        </Button> : null}
+          onPress={this.handleGive}/> : null}
         {showLook ? <Button
           title="Look For Parking!"
-          onPress={this.handleLook}>
-          Look for Parking!
-        </Button> : null}
+          onPress={this.handleLook} />
+        : null}
       </View>
     );
   }
