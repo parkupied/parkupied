@@ -38,11 +38,13 @@ export default class Map extends Component {
       let destinations = [];
       let emails = [];
       allSpots.docChanges.forEach(spot => {
-        const spotObj = spot.doc.data().Coordinates;
-        const email = spot.doc.data().email;
-        let newDestination = `${spotObj.latitude},${spotObj.longitude}`; //Leave this as spot obj
-        destinations.push(newDestination);
-        emails.push(email)
+        if (Object.keys(spot.doc.data()).length) {
+          const spotObj = spot.doc.data().Coordinates;
+          const email = spot.doc.data().email;
+          let newDestination = `${spotObj.latitude},${spotObj.longitude}`; //Leave this as spot obj
+          destinations.push(newDestination);
+          emails.push(email);
+        }
       })
       destinations = destinations.join('|');
       const currentSpots = this.state.parkingSpots;

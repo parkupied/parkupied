@@ -57,7 +57,7 @@ async function login (email, password) {
         });
     if (res) return res;
     if (exists) {
-        firebase.auth().signInWithEmailAndPassword(email, password)
+        await firebase.auth().signInWithEmailAndPassword(email, password)
         return true; // This is the successful login case
     } else {
         return "That is not a registered user. Try a different email or signing up.";
