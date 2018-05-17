@@ -66,7 +66,7 @@ containerRow: {
     alignItems: 'center',
 },
 welcomeButton: {
-    width: 400,
+    width: 150,
     borderColor: "white",
     borderWidth: 1,
     borderRadius: 5,
