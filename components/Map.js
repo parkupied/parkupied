@@ -247,7 +247,7 @@ export default class Map extends Component {
 
   onRegionChangeComplete = async (location) => {
     let origin = `${location.latitude}, ${location.longitude}`;
-    this.setState({ movinglocation: origin });
+    if (!this.state.showMatch) this.setState({ movinglocation: origin });
 
     let matchingEmail = '';
     let myLocation = '';
