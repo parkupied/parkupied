@@ -135,13 +135,10 @@ export default class Map extends Component {
   handleCancel = async (deleteSpotBool) => {
     this.setState({ showMatch: false, showLook: true, showGive: true, possibleMatch: {}, showStopOfferButt: false });
     let id;
-    console.log('Inside of handleCancel');
     if (deleteSpotBool) {
-      console.log("Inside of if statement");
       await firestore.collection("parkingSpots").where("email", "==", firebase.auth().currentUser.email).get().then(spots => {
         spots.forEach(spot => {
           id = spot.id;
-          console.log(">>>>>", id);
         })
       })
       firestore.collection("parkingSpots").doc(id).delete();
