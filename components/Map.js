@@ -30,6 +30,7 @@ export default class Map extends Component {
     possibleMatch: {},
     showDirections: false,
     modalEmail: '',
+    showNoPSAlert: false,
   }
 
   componentDidMount() {
@@ -62,6 +63,10 @@ export default class Map extends Component {
     let origin = `${this.state.location.coords.latitude}, ${this.state.location.coords.longitude}`;
     let destination = this.state.parkingSpots;
 
+    if (!this.state.parkingSpots.length) { // I made it to be dot-length, so that if it gets changed to an array, this doesn't need to change
+      this.setState({ showNoPSAlert: true });
+      return;
+    }
 
     const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${origin}&destinations=${destination}&key=${key}`
 
@@ -247,7 +252,7 @@ export default class Map extends Component {
 
   onRegionChangeComplete = async (location) => {
     let origin = `${location.latitude}, ${location.longitude}`;
-    if (!this.state.showMatch) this.setState({ movinglocation: origin });
+    if (!this.state.showMatch && !this.state.showNoPSAlert) this.setState({ movinglocation: origin });
 
     let matchingEmail = '';
     let myLocation = '';
@@ -273,7 +278,7 @@ export default class Map extends Component {
 
 
   render() {
-    const { location, marker, matchedMarker, possibleMatch, showMatch, showDirections, showGive, showLook } = this.state;
+    const { location, marker, matchedMarker, possibleMatch, showMatch, showDirections, showGive, showLook, showNoPSAlert } = this.state;
     return (
       <View style={styles.container}>
 
@@ -305,6 +310,15 @@ export default class Map extends Component {
           [
             { text: 'Lets Go!', onPress: () => this.handleMatch(), style: 'cancel' },
             { text: 'Cancel', onPress: () => this.handleCancel(), style: 'cancel' }
+          ],
+          { cancelable: false }
+        ) : null}
+
+        {showNoPSAlert ? Alert.alert(
+          `It looks like no one is offering parking, sir.`,
+          'Please try again later',
+          [
+            { text: 'Our deepest apologies.', onPress: () => this.setState({ showNoPSAlert: false, showGive: true, showLook: true }), style: 'cancel' }
           ],
           { cancelable: false }
         ) : null}
