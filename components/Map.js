@@ -32,6 +32,7 @@ export default class Map extends Component {
     modalEmail: '',
     showNoPSAlert: false,
     showStopOfferButt: false,
+    showFinalAlert: false,
   }
 
   componentDidMount() {
@@ -161,7 +162,7 @@ export default class Map extends Component {
           if (match.doc.data() && match.doc.data().matches && match.doc.data().matches.location) {
             const perfectCoords = match.doc.data().matches.location.split(',');
             const finalMatch = { latitude: +perfectCoords[0], longitude: +perfectCoords[1] };
-            this.setState({ matchedMarker: finalMatch, modalEmail: match.doc.data().matches.email })
+            this.setState({ matchedMarker: finalMatch, modalEmail: match.doc.data().matches.email, showStopOfferButt: false })
           }
         })
       })
@@ -217,10 +218,18 @@ export default class Map extends Component {
       firestore.collection("parkingSpots").doc(spotId).update({
         confirmationCount: ++confCount
       })
+      firestore.collection("parkingSpots").doc(spotId).onSnapshot(doc => {
+        if (doc.data() && doc.data().confirmationCount === 2) {
+          this.setState({ showFinalAlert: true });
+        }
+      })
     } else {
       // const secondEmail = (spotEmail === currEmail) ? get match email : currEmail;
       let firstId; let secondId; let firstPoints; let secondPoints;
       if (spotId) {
+        firestore.collection("parkingSpots").doc(spotId).update({
+          confirmationCount: ++confCount
+        });
         await firestore.collection("parkingSpots").doc(spotId).delete();
       }
 
@@ -237,6 +246,7 @@ export default class Map extends Component {
       // Now update
       firestore.collection("users").doc(firstId).update({ matches: {} });
       firestore.collection("users").doc(secondId).update({ matches: {} });
+      this.setState({ showFinalAlert: true })
     }
     // Increment the Confirmation Count
     // If Conf Count == 2 then do other stuff // And show changes
@@ -262,7 +272,7 @@ export default class Map extends Component {
 
   onRegionChangeComplete = async (location) => {
     let origin = `${location.latitude}, ${location.longitude}`;
-    if (!this.state.showMatch && !this.state.showNoPSAlert) this.setState({ movinglocation: origin });
+    if (!this.state.showFinalAlert && !this.state.showMatch && !this.state.showNoPSAlert) this.setState({ movinglocation: origin });
 
     let matchingEmail = '';
     let myLocation = '';
@@ -288,7 +298,7 @@ export default class Map extends Component {
 
 
   render() {
-    const { location, marker, matchedMarker, possibleMatch, showMatch, showDirections, showGive, showLook, showNoPSAlert } = this.state;
+    const { location, marker, matchedMarker, possibleMatch, showMatch, showDirections, showGive, showLook, showNoPSAlert, showFinalAlert } = this.state;
     return (
       <View style={styles.container}>
 
@@ -329,6 +339,15 @@ export default class Map extends Component {
           'Please try again later',
           [
             { text: 'Our deepest apologies.', onPress: () => this.setState({ showNoPSAlert: false, showGive: true, showLook: true }), style: 'cancel' }
+          ],
+          { cancelable: false }
+        ) : null}
+
+        {showFinalAlert ? Alert.alert(
+          `You did it!!`,
+          'The transaction was completed successfully. Please have a great day!',
+          [
+            { text: 'Parking is fun!', onPress: () => this.setState({ showNoPSAlert: false, showGive: true, showLook: true, modalEmail: '', showStopOfferButt: false, showFinalAlert: false }), style: 'cancel' }
           ],
           { cancelable: false }
         ) : null}
