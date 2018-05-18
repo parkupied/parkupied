@@ -50,16 +50,16 @@ export default class UserInfo extends Component {
                 }}>
                     <View style={{
                         width: 300,
-                        height: 600,
-                        backgroundColor: 'rgba(255,255,255,0.5)',
+                        height: 500,
+                        backgroundColor: 'rgba(102, 153, 255, 0.75)'
                     }}>
-                        <Text style={{fontSize: 32, color: 'white', fontWeight: 'bold', textAlign: 'center' }} >You got a match!</Text>
-                        <Text>You've matched with {this.state && this.state.name}</Text>
-                        <Text>Phone: {this.state && this.state.phone}</Text>
-                        <Text>Car: {this.state && this.state.carMake}</Text>
-                        <Text>Color: {this.state && this.state.carColor}</Text>
-                        <Text>Model: {this.state && this.state.carModel}</Text>
-                        <Text>License: {this.state && this.state.license}</Text>
+                        <Text style={{fontSize: 52, color: 'aqua', fontWeight: 'bold', textAlign: 'center' }} >You got a match!</Text>
+                        <Text style={{fontSize: 25}}>You've matched with {this.state && this.state.name}</Text>
+                        <Text style={{fontSize: 25}} >Phone: {this.state && this.state.phone}</Text>
+                        <Text style={{fontSize: 25}}>Car: {this.state && this.state.carMake}</Text>
+                        <Text style={{fontSize: 25}}>Color: {this.state && this.state.carColor}</Text>
+                        <Text style={{fontSize: 25}}>Model: {this.state && this.state.carModel}</Text>
+                        <Text style={{fontSize: 25}}>License: {this.state && this.state.license}</Text>
                         <Button style={style.button} title="Close me!" onPress={() => this.setState({ isOpen: false })} />
                     </View>
                 </View>
