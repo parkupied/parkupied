@@ -31,6 +31,7 @@ export default class Map extends Component {
     showDirections: false,
     modalEmail: '',
     showNoPSAlert: false,
+    showStopOfferButt: false,
   }
 
   componentDidMount() {
@@ -115,7 +116,7 @@ export default class Map extends Component {
     const coordinates = this.state.possibleMatch.coordinates;
     const matchingEmail = await this.state.possibleMatch.matchingEmail;
     const currUserEmail = firebase.auth().currentUser.email;
-    this.setState({ showMatch: false, modalEmail: matchingEmail, matchedMarker: coordinates, showDirections: true });
+    this.setState({ showMatch: false, modalEmail: matchingEmail, matchedMarker: coordinates, showDirections: true, showStopOfferButt: false });
     firestore.collection('users').where('email', '==', matchingEmail).get().then(allUsers => {
       allUsers.forEach(user => {
         const id = user.id;
@@ -131,8 +132,17 @@ export default class Map extends Component {
     })
   }
 
-  handleCancel = () => {
-    this.setState({ showMatch: false, showLook: true, showGive: true, possibleMatch: {} })
+  handleCancel = async (deleteSpotBool) => {
+    this.setState({ showMatch: false, showLook: true, showGive: true, possibleMatch: {}, showStopOfferButt: false });
+    let id;
+    if (deleteSpotBool) {
+      await firestore.collection("parkingSpots").where("email", "==", firebase.auth().currentUser.email).get().then(spots => {
+        spots.forEach(spot => {
+          id = spot.id;
+        })
+      })
+      firestore.collection("parkingSpots").doc(id).delete();
+    }
   }
 
 
@@ -156,7 +166,7 @@ export default class Map extends Component {
         })
       })
 
-    this.setState({ showGive: false, showLook: false })
+    this.setState({ showGive: false, showLook: false, showStopOfferButt: true })
   }
 
 
@@ -328,6 +338,9 @@ export default class Map extends Component {
         {this.state.modalEmail ? this.state.modalEmail.length ? <Button 
           title="Confirm Transaction is Complete" onPress={this.handleFinalizeTransaction} /> : null : null}
 
+        {this.state.showStopOfferButt ? <Button 
+          title="Stop offering your Parking Spot" onPress={() => this.handleCancel(true)} /> : null}
+          
         {showDirections ? <Button
           onPress={this.handleGetDirections} title="Get Directions" />
           : null}
